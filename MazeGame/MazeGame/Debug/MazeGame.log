@@ -1,0 +1,8 @@
+﻿  main.cpp
+C:\maze-game\MazeGame\MazeGame\main.cpp(43,27): warning C4018: <: несоответствие типов со знаком и без знака
+C:\maze-game\MazeGame\MazeGame\main.cpp(50,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\maze-game\MazeGame\MazeGame\main.cpp(52,27): warning C4018: <: несоответствие типов со знаком и без знака
+C:\maze-game\MazeGame\MazeGame\main.cpp(66,23): warning C4018: <: несоответствие типов со знаком и без знака
+C:\maze-game\MazeGame\MazeGame\main.cpp(67,27): warning C4018: <: несоответствие типов со знаком и без знака
+C:\maze-game\MazeGame\MazeGame\main.cpp(101,15): warning C4101: event: неиспользованная локальная переменная
+  MazeGame.vcxproj -> C:\maze-game\MazeGame\Debug\MazeGame.exe
