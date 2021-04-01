@@ -140,7 +140,7 @@ void Menu()
         else { exit.setFillColor(Color(0, 7, 77)); }
         if (Mouse::isButtonPressed(Mouse::Left))
         {
-            if (MenuNum == 1) isMenu = false;
+            if (MenuNum == 1) { isMenu = false; game_run(); }
             if (MenuNum == 2) isMenu = false;
             if (MenuNum == 3) { window.close(); isMenu = false; }
         }
