@@ -248,9 +248,6 @@ void game_run()
         for (Sprite elem : roadSprites) {
             window.draw(elem);
         }
-        for (Sprite elem : stuffSprites) {
-            window.draw(elem);
-        }
         if (FRAME_NUMBER % 15 < 7) {
             character.characterSprite.setTexture(character.characterTexture1);
         }
@@ -258,6 +255,10 @@ void game_run()
             character.characterSprite.setTexture(character.characterTexture2);
         }
         window.draw(character.characterSprite);
+
+        for (Sprite elem : stuffSprites) {
+            window.draw(elem);
+        }
 
         FRAME_NUMBER++;
         if (FRAME_NUMBER % 30 == 0) {
