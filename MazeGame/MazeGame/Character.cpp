@@ -23,10 +23,10 @@ bool Character::can_move(std::vector <Sprite> borderSprites, int x, int y) {
         x1 = block.left;
         x2 = block.left + block.width;
         y1 = block.top;
-        y2 = block.top + block.height * 0.7;
+        y2 = block.top + block.height;
 
         // Левый верхний угол
-        if (pos.left + x >= x1 && pos.left + x <= x2 && pos.top + y >= y1 && pos.top + y <= y2) {
+        if (pos.left + x >= x1 && pos.left + x <= x2 && pos.top + y >= y1 && pos.top + y <= y2 - block.height * 0.2) {
             return false;
         }
 
@@ -36,7 +36,7 @@ bool Character::can_move(std::vector <Sprite> borderSprites, int x, int y) {
         }
 
         // Правый верхний угол
-        if (pos.left + x + pos.width >= x1 && pos.left + x + pos.width <= x2 && pos.top + y >= y1 && pos.top + y <= y2) {
+        if (pos.left + x + pos.width >= x1 && pos.left + x + pos.width <= x2 && pos.top + y >= y1 && pos.top + y <= y2 - block.height * 0.2) {
             return false;
         }
 
