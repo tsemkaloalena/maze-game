@@ -1,4 +1,4 @@
-#include "Character.h"
+ï»¿#include "Character.h"
 #include <SFML/Graphics.hpp>
 #include <vector>
 using namespace sf;
@@ -23,22 +23,22 @@ bool Character::can_move(std::vector <Sprite> borderSprites, int x, int y) {
         y1 = block.top;
         y2 = block.top + block.height;
 
-        // Ëåâûé âåðõíèé óãîë
+        // Ð›ÐµÐ²Ñ‹Ð¹ Ð²ÐµÑ€Ñ…Ð½Ð¸Ð¹ ÑƒÐ³Ð¾Ð»
         if (pos.left + x >= x1 && pos.left + x <= x2 && pos.top + y >= y1 && pos.top + y <= y2) {
             return false;
         }
 
-        // Ëåâûé íèæíèé óãîë
+        // Ð›ÐµÐ²Ñ‹Ð¹ Ð½Ð¸Ð¶Ð½Ð¸Ð¹ ÑƒÐ³Ð¾Ð»
         if (pos.left + x >= x1 && pos.left + x <= x2 && pos.top + y + pos.height >= y1 && pos.top + y + pos.height <= y2) {
             return false;
         }
 
-        // Ïðàâûé âåðõíèé óãîë
+        // ÐŸÑ€Ð°Ð²Ñ‹Ð¹ Ð²ÐµÑ€Ñ…Ð½Ð¸Ð¹ ÑƒÐ³Ð¾Ð»
         if (pos.left + x + pos.width >= x1 && pos.left + x + pos.width <= x2 && pos.top + y >= y1 && pos.top + y <= y2) {
             return false;
         }
 
-        // Ïðàâûé íèæíèé óãîë
+        // ÐŸÑ€Ð°Ð²Ñ‹Ð¹ Ð½Ð¸Ð¶Ð½Ð¸Ð¹ ÑƒÐ³Ð¾Ð»
         if (pos.left + x + pos.width >= x1 && pos.left + x + pos.width <= x2 && pos.top + y + pos.height >= y1 && pos.top + y + pos.height <= y2) {
             return false;
         }

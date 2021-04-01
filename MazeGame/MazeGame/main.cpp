@@ -1,4 +1,4 @@
-#include "Character.h"
+п»ї#include "Character.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -13,12 +13,12 @@ int WINDOW_HEIGHT = 850;
 int GAME_WIDTH = 800;
 int GAME_HEIGHT = 800;
 std::string theme;
-// Здесь должны быть объявлены все функции, находящиеся в этом файле (конечно, кроме main)
+// Р—РґРµСЃСЊ РґРѕР»Р¶РЅС‹ Р±С‹С‚СЊ РѕР±СЉСЏРІР»РµРЅС‹ РІСЃРµ С„СѓРЅРєС†РёРё, РЅР°С…РѕРґСЏС‰РёРµСЃСЏ РІ СЌС‚РѕРј С„Р°Р№Р»Рµ (РєРѕРЅРµС‡РЅРѕ, РєСЂРѕРјРµ main)
 void load_level(int num);
 void game_run();
 
-std::vector <std::vector <char>> level_map; // Двумерный массив для хранения знаков уровня
-// # - граница; . - дорога; @ - дорога, начальное положение персонажа
+std::vector <std::vector <char>> level_map; // Р”РІСѓРјРµСЂРЅС‹Р№ РјР°СЃСЃРёРІ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ Р·РЅР°РєРѕРІ СѓСЂРѕРІРЅСЏ
+// # - РіСЂР°РЅРёС†Р°; . - РґРѕСЂРѕРіР°; @ - РґРѕСЂРѕРіР°, РЅР°С‡Р°Р»СЊРЅРѕРµ РїРѕР»РѕР¶РµРЅРёРµ РїРµСЂСЃРѕРЅР°Р¶Р°
 std::vector <std::vector <Texture>> fieldTextures;
 std::vector <Sprite> borderSprites;
 std::vector <Sprite> roadSprites;
@@ -32,7 +32,7 @@ int main() {
 
 
 void load_level(int num) {
-    // Очистка векторов. На случай, когда уровень не первый.
+    // РћС‡РёСЃС‚РєР° РІРµРєС‚РѕСЂРѕРІ. РќР° СЃР»СѓС‡Р°Р№, РєРѕРіРґР° СѓСЂРѕРІРµРЅСЊ РЅРµ РїРµСЂРІС‹Р№.
     borderSprites.clear();
     roadSprites.clear();
     fieldTextures.clear();
@@ -40,7 +40,7 @@ void load_level(int num) {
     roadSprites.shrink_to_fit();
     fieldTextures.shrink_to_fit();
 
-    // Считывание из текстового файла, причём файл называется "<номер уровня>.txt"
+    // РЎС‡РёС‚С‹РІР°РЅРёРµ РёР· С‚РµРєСЃС‚РѕРІРѕРіРѕ С„Р°Р№Р»Р°, РїСЂРёС‡С‘Рј С„Р°Р№Р» РЅР°Р·С‹РІР°РµС‚СЃСЏ "<РЅРѕРјРµСЂ СѓСЂРѕРІРЅСЏ>.txt"
     std::string number = std::to_string(num);
     std::string filename = "data/levels/" + number + ".txt";
     std::fstream data;
@@ -57,7 +57,7 @@ void load_level(int num) {
     }
     data.close();
 
-    // Запись текстур в vector
+    // Р—Р°РїРёСЃСЊ С‚РµРєСЃС‚СѓСЂ РІ vector
     std::string type;
     for (int i = 0; i < level_map.size(); i++) {
         fieldTextures.push_back(std::vector<Texture>());
@@ -74,7 +74,7 @@ void load_level(int num) {
         }
     }
 
-    // Запись спрайтов в 2 вектора (границы и дорога)
+    // Р—Р°РїРёСЃСЊ СЃРїСЂР°Р№С‚РѕРІ РІ 2 РІРµРєС‚РѕСЂР° (РіСЂР°РЅРёС†С‹ Рё РґРѕСЂРѕРіР°)
     float block_size = (float)GAME_WIDTH / level_map[0].size();
     for (int i = 0; i < level_map.size(); i++) {
         for (int j = 0; j < level_map[i].size(); j++) {
@@ -98,7 +98,7 @@ void load_level(int num) {
 }
 
 
-// Функция с процессом игры
+// Р¤СѓРЅРєС†РёСЏ СЃ РїСЂРѕС†РµСЃСЃРѕРј РёРіСЂС‹
 void game_run()
 {
     float SPEED = 5.0;
