@@ -8,10 +8,9 @@
 
 using namespace sf;
 
-int WINDOW_WIDTH = 600;
-int WINDOW_HEIGHT = 650;
-int GAME_WIDTH = 600;
-int GAME_HEIGHT = 600;
+int SPACE_HEIGHT = 50;
+int WIDTH = 600;
+int HEIGHT = 600;
 std::string theme;
 // Здесь должны быть объявлены все функции, находящиеся в этом файле (конечно, кроме main)
 void load_level(int num);
@@ -92,12 +91,12 @@ void load_level(int num) {
 
     // Запись спрайтов в 2 вектора (границы и дорога)
     int k = 0;
-    float block_size = (float)GAME_WIDTH / level_map[0].size();
+    float block_size = (float)HEIGHT / level_map[0].size();
     for (int i = 0; i < level_map.size(); i++) {
         for (int j = 0; j < level_map[i].size(); j++) {
             Sprite fieldSprite;
             fieldSprite.setTexture(fieldTextures[i][j]);
-            fieldSprite.setPosition(i * block_size, j * block_size + WINDOW_HEIGHT - GAME_HEIGHT);
+            fieldSprite.setPosition(i * block_size, j * block_size + SPACE_HEIGHT);
             fieldSprite.setScale(block_size / fieldTextures[i][j].getSize().x, block_size / fieldTextures[i][j].getSize().x);
 
             if (level_map[i][j] == '.') {
@@ -116,7 +115,7 @@ void load_level(int num) {
             }
             else if (level_map[i][j] == '@') {
                 roadSprites.push_back(fieldSprite);
-                character.make_sprite(theme, j * block_size, i * block_size + WINDOW_HEIGHT - GAME_HEIGHT, block_size * 0.8);
+                character.make_sprite(theme, j * block_size, i * block_size + SPACE_HEIGHT, block_size * 0.8);
             }
         }
     }
@@ -183,8 +182,11 @@ void game_run()
     int TIMER = 0;
     bool SCORE_RECORDED = false;
     bool PLAY = true;
+    HEIGHT = VideoMode::getDesktopMode().height - SPACE_HEIGHT * 4;
+    WIDTH = HEIGHT;
     
-    RenderWindow window(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Maze");
+    RenderWindow window(VideoMode(WIDTH, HEIGHT + SPACE_HEIGHT), "Maze");
+    window.setPosition(sf::Vector2i(0, 0));
     window.setFramerateLimit(30);
 
     load_level(1);
@@ -210,14 +212,14 @@ void game_run()
         }
 
         if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
-            if (character.characterSprite.getPosition().y > WINDOW_HEIGHT - GAME_HEIGHT) {
+            if (character.characterSprite.getPosition().y > SPACE_HEIGHT) {
                 if (character.can_move(borderSprites, 0, -SPEED)) {
                     character.characterSprite.move(0, -SPEED);
                 }
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Down)) {
-            if (character.characterSprite.getPosition().y + character.characterSprite.getGlobalBounds().height < WINDOW_HEIGHT) {
+            if (character.characterSprite.getPosition().y + character.characterSprite.getGlobalBounds().height < HEIGHT + SPACE_HEIGHT) {
                 if (character.can_move(borderSprites, 0, SPEED)) {
                     character.characterSprite.move(0, SPEED);
                 }
@@ -231,7 +233,7 @@ void game_run()
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-            if (character.characterSprite.getPosition().x + character.characterSprite.getGlobalBounds().width < GAME_WIDTH) {
+            if (character.characterSprite.getPosition().x + character.characterSprite.getGlobalBounds().width < WIDTH) {
                 if (character.can_move(borderSprites, SPEED, 0)) {
                     character.characterSprite.move(SPEED, 0);
                 }
