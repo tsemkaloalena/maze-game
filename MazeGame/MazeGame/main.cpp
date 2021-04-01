@@ -1,3 +1,4 @@
+#include "Character.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -14,7 +15,6 @@ int GAME_HEIGHT = 800;
 std::string theme;
 // Здесь должны быть объявлены все функции, находящиеся в этом файле (конечно, кроме main)
 void load_level(int num);
-void add_character(float x, float y, float size);
 void game_run();
 
 std::vector <std::vector <char>> level_map; // Двумерный массив для хранения знаков уровня
@@ -22,9 +22,8 @@ std::vector <std::vector <char>> level_map; // Двумерный массив для хранения зна
 std::vector <std::vector <Texture>> fieldTextures;
 std::vector <Sprite> borderSprites;
 std::vector <Sprite> roadSprites;
-// Текстура и спрайт персонажа
-Texture characterTexture;
-Sprite character;
+
+Character character;
 
 int main() {
     game_run();
@@ -56,6 +55,7 @@ void load_level(int num) {
         }
         i++;
     }
+    data.close();
 
     // Запись текстур в vector
     std::string type;
@@ -91,53 +91,14 @@ void load_level(int num) {
             }
             else if (level_map[i][j] == '@') {
                 roadSprites.push_back(fieldSprite);
-                add_character(j * block_size, i * block_size + WINDOW_HEIGHT - GAME_HEIGHT, block_size * 0.7);
+                character.make_sprite(j * block_size, i * block_size + WINDOW_HEIGHT - GAME_HEIGHT, block_size * 0.7);
             }
         }
     }
 }
 
-void add_character(float x, float y, float size) {
-    characterTexture.loadFromFile("data/images/character.png");
-    characterTexture.setSmooth(true);
-    character.setTexture(characterTexture);
-    character.setPosition(x, y);
-    character.setScale(size / characterTexture.getSize().x, size / characterTexture.getSize().x);
-}
 
-bool can_move(FloatRect character, int x, int y) {
-    int x1, x2, y1, y2;
-    FloatRect block;
-    for (Sprite elem : borderSprites) {
-        block = elem.getGlobalBounds();
-        x1 = block.left;
-        x2 = block.left + block.width;
-        y1 = block.top;
-        y2 = block.top + block.height;
-
-        // Левый верхний угол
-        if (character.left + x >= x1 && character.left + x <= x2 && character.top + y >= y1 && character.top + y <= y2) {
-            return false;
-        }
-
-        // Левый нижний угол
-        if (character.left + x >= x1 && character.left + x <= x2 && character.top + y + character.height >= y1 && character.top + y + character.height <= y2) {
-            return false;
-        }
-
-        // Правый верхний угол
-        if (character.left + x + character.width >= x1 && character.left + x + character.width <= x2 && character.top + y >= y1 && character.top + y <= y2) {
-            return false;
-        }
-
-        // Правый нижний угол
-        if (character.left + x + character.width >= x1 && character.left + x + character.width <= x2 && character.top + y + character.height >= y1 && character.top + y + character.height <= y2) {
-            return false;
-        }
-    }
-    return true;
-}
-
+// Функция с процессом игры
 void game_run()
 {
     float SPEED = 5.0;
@@ -172,30 +133,30 @@ void game_run()
         }
 
         if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
-            if (character.getPosition().y > WINDOW_HEIGHT - GAME_HEIGHT) {
-                if (can_move(character.getGlobalBounds(), 0, -SPEED)) {
-                    character.move(0, -SPEED);
+            if (character.characterSprite.getPosition().y > WINDOW_HEIGHT - GAME_HEIGHT) {
+                if (character.can_move(borderSprites, 0, -SPEED)) {
+                    character.characterSprite.move(0, -SPEED);
                 }
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Down)) {
-            if (character.getPosition().y + character.getGlobalBounds().height < WINDOW_HEIGHT) {
-                if (can_move(character.getGlobalBounds(), 0, SPEED)) {
-                    character.move(0, SPEED);
+            if (character.characterSprite.getPosition().y + character.characterSprite.getGlobalBounds().height < WINDOW_HEIGHT) {
+                if (character.can_move(borderSprites, 0, SPEED)) {
+                    character.characterSprite.move(0, SPEED);
                 }
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-            if (character.getPosition().x > 0) {
-                if (can_move(character.getGlobalBounds(), -SPEED, 0)) {
-                    character.move(-SPEED, 0);
+            if (character.characterSprite.getPosition().x > 0) {
+                if (character.can_move(borderSprites, -SPEED, 0)) {
+                    character.characterSprite.move(-SPEED, 0);
                 }
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-            if (character.getPosition().x + character.getGlobalBounds().width < GAME_WIDTH) {
-                if (can_move(character.getGlobalBounds(), SPEED, 0)) {
-                    character.move(SPEED, 0);
+            if (character.characterSprite.getPosition().x + character.characterSprite.getGlobalBounds().width < GAME_WIDTH) {
+                if (character.can_move(borderSprites, SPEED, 0)) {
+                    character.characterSprite.move(SPEED, 0);
                 }
             }
         }
@@ -208,7 +169,7 @@ void game_run()
         for (Sprite elem : roadSprites) {
             window.draw(elem);
         }
-        window.draw(character);
+        window.draw(character.characterSprite);
 
         FRAME_NUMBER++;
         if (FRAME_NUMBER % 30 == 0) {
