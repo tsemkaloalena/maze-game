@@ -7,8 +7,10 @@
 
 using namespace sf;
 
-int WIDTH = 800;
-int HEIGHT = 800;
+int WINDOW_WIDTH = 800;
+int WINDOW_HEIGHT = 850;
+int GAME_WIDTH = 800;
+int GAME_HEIGHT = 800;
 std::string theme;
 // Здесь должны быть объявлены все функции, находящиеся в этом файле (конечно, кроме main)
 void load_level(int num);
@@ -73,12 +75,12 @@ void load_level(int num) {
     }
 
     // Запись спрайтов в 2 вектора (границы и дорога)
-    float block_size = (float)WIDTH / level_map[0].size();
+    float block_size = (float)GAME_WIDTH / level_map[0].size();
     for (int i = 0; i < level_map.size(); i++) {
         for (int j = 0; j < level_map[i].size(); j++) {
             Sprite fieldSprite;
             fieldSprite.setTexture(fieldTextures[i][j]);
-            fieldSprite.setPosition(i * block_size, j * block_size);
+            fieldSprite.setPosition(i * block_size, j * block_size + WINDOW_HEIGHT - GAME_HEIGHT);
             fieldSprite.setScale(block_size / fieldTextures[i][j].getSize().x, block_size / fieldTextures[i][j].getSize().x);
 
             if (level_map[i][j] == '.') {
@@ -89,7 +91,7 @@ void load_level(int num) {
             }
             else if (level_map[i][j] == '@') {
                 roadSprites.push_back(fieldSprite);
-                add_character(j * block_size, i * block_size, block_size * 0.7);
+                add_character(j * block_size, i * block_size + WINDOW_HEIGHT - GAME_HEIGHT, block_size * 0.7);
             }
         }
     }
@@ -140,14 +142,20 @@ void game_run()
 {
     float SPEED = 5.0;
     int FRAME_NUMBER = 0;
-    int SCORE = 0;
+    int TIMER = 0;
     bool SCORE_RECORDED = false;
     bool PLAY = true;
     
-    RenderWindow window(VideoMode(WIDTH, HEIGHT), "Maze");
+    RenderWindow window(VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Maze");
     window.setFramerateLimit(30);
 
     load_level(1);
+
+    Font font;
+    font.loadFromFile("./data/fonts/HotMustardBTNPosterRegular.ttf");
+    Text timerText("", font, 30);
+    timerText.setFillColor(Color(0, 0, 0));
+    timerText.setPosition(10, 10);
 
     while (window.isOpen())
     {
@@ -164,35 +172,36 @@ void game_run()
         }
 
         if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
-            if (character.getPosition().y > 0) {
+            if (character.getPosition().y > WINDOW_HEIGHT - GAME_HEIGHT) {
                 if (can_move(character.getGlobalBounds(), 0, -SPEED)) {
                     character.move(0, -SPEED);
                 }
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Down)) {
-            if (character.getPosition().y < HEIGHT) {
+            if (character.getPosition().y + character.getGlobalBounds().height < WINDOW_HEIGHT) {
                 if (can_move(character.getGlobalBounds(), 0, SPEED)) {
                     character.move(0, SPEED);
                 }
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-            if (character.getPosition().y < HEIGHT) {
+            if (character.getPosition().x > 0) {
                 if (can_move(character.getGlobalBounds(), -SPEED, 0)) {
                     character.move(-SPEED, 0);
                 }
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-            if (character.getPosition().y < HEIGHT) {
+            if (character.getPosition().x + character.getGlobalBounds().width < GAME_WIDTH) {
                 if (can_move(character.getGlobalBounds(), SPEED, 0)) {
                     character.move(SPEED, 0);
                 }
             }
         }
 
-        window.clear();
+        window.clear(Color(218, 255, 88));
+
         for (Sprite elem : borderSprites) {
             window.draw(elem);
         }
@@ -200,6 +209,16 @@ void game_run()
             window.draw(elem);
         }
         window.draw(character);
+
+        FRAME_NUMBER++;
+        if (FRAME_NUMBER % 30 == 0) {
+            TIMER++;
+        }
+        std::stringstream ss;
+        ss << TIMER;
+        timerText.setString(ss.str());
+        window.draw(timerText);
+
         window.display();
     }
 }
