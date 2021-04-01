@@ -107,7 +107,7 @@ void load_level(int num) {
                 if ((i + j) % 7 == 3) {
                     Sprite stuffSprite;
                     stuffSprite.setTexture(stuffTextures[k]);
-                    stuffSprite.setPosition(i * block_size, j * block_size + block_size * 0.4);
+                    stuffSprite.setPosition(i * block_size, j * block_size + SPACE_HEIGHT - block_size * 0.3);
                     stuffSprite.setScale(block_size / stuffTextures[k].getSize().x, block_size / stuffTextures[k].getSize().x);
                     stuffSprites.push_back(stuffSprite);
                     k++;
