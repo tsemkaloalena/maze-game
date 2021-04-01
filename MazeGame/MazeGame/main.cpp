@@ -24,6 +24,11 @@ std::vector <std::vector <Texture>> fieldTextures;
 std::vector <Sprite> borderSprites;
 std::vector <Sprite> roadSprites;
 
+std::string* stuffImages = new std::string[3];
+std::vector <Texture> stuffTextures;
+std::vector <Sprite> stuffSprites;
+
+
 Character character;
 
 int main() {
@@ -59,6 +64,10 @@ void load_level(int num) {
     }
     data.close();
 
+    stuffImages[0] = "data/images/" + theme + "_stuff1.png";
+    stuffImages[1] = "data/images/" + theme + "_stuff2.png";
+    stuffImages[2] = "data/images/" + theme + "_stuff3.png";
+
     // Запись текстур в vector
     std::string type;
     for (int i = 0; i < level_map.size(); i++) {
@@ -70,6 +79,11 @@ void load_level(int num) {
             }
             else if (level_map[i][j] == '#') {
                 type = "border";
+                if ((i + j) % 7 == 3) {
+                    Texture stuffTexture;
+                    stuffTexture.loadFromFile(stuffImages[rand() % 3]);
+                    stuffTextures.push_back(stuffTexture);
+                }
             }
             fieldTexture.loadFromFile("data/images/" + theme + "_" + type + ".jpg");
             fieldTextures[i].push_back(fieldTexture);
@@ -77,6 +91,7 @@ void load_level(int num) {
     }
 
     // Запись спрайтов в 2 вектора (границы и дорога)
+    int k = 0;
     float block_size = (float)GAME_WIDTH / level_map[0].size();
     for (int i = 0; i < level_map.size(); i++) {
         for (int j = 0; j < level_map[i].size(); j++) {
@@ -90,10 +105,18 @@ void load_level(int num) {
             }
             else if (level_map[i][j] == '#') {
                 borderSprites.push_back(fieldSprite);
+                if ((i + j) % 7 == 3) {
+                    Sprite stuffSprite;
+                    stuffSprite.setTexture(stuffTextures[k]);
+                    stuffSprite.setPosition(i * block_size, j * block_size + block_size * 0.4);
+                    stuffSprite.setScale(block_size / stuffTextures[k].getSize().x, block_size / stuffTextures[k].getSize().x);
+                    stuffSprites.push_back(stuffSprite);
+                    k++;
+                }
             }
             else if (level_map[i][j] == '@') {
                 roadSprites.push_back(fieldSprite);
-                character.make_sprite(theme, j * block_size, i * block_size + WINDOW_HEIGHT - GAME_HEIGHT, block_size * 0.7);
+                character.make_sprite(theme, j * block_size, i * block_size + WINDOW_HEIGHT - GAME_HEIGHT, block_size * 0.8);
             }
         }
     }
@@ -221,6 +244,9 @@ void game_run()
             window.draw(elem);
         }
         for (Sprite elem : roadSprites) {
+            window.draw(elem);
+        }
+        for (Sprite elem : stuffSprites) {
             window.draw(elem);
         }
         if (FRAME_NUMBER % 15 < 7) {

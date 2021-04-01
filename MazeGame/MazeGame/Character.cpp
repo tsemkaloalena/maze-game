@@ -6,12 +6,12 @@ using namespace sf;
 void Character::make_sprite(std::string theme, float x, float y, float size)
 {
     characterTexture1.loadFromFile("data/images/" + theme + "_character1.png");
-    characterTexture1.setSmooth(true);
+    //characterTexture1.setSmooth(true);
     characterTexture2.loadFromFile("data/images/" + theme + "_character2.png");
-    characterTexture2.setSmooth(true);
+    //characterTexture2.setSmooth(true);
     characterSprite.setTexture(characterTexture1);
     characterSprite.setPosition(x, y);
-    characterSprite.setScale(size / characterTexture1.getSize().x, size / characterTexture1.getSize().x);
+    characterSprite.setScale(size / characterTexture1.getSize().y, size / characterTexture1.getSize().y);
 }
 
 bool Character::can_move(std::vector <Sprite> borderSprites, int x, int y) {
@@ -23,7 +23,7 @@ bool Character::can_move(std::vector <Sprite> borderSprites, int x, int y) {
         x1 = block.left;
         x2 = block.left + block.width;
         y1 = block.top;
-        y2 = block.top + block.height;
+        y2 = block.top + block.height * 0.7;
 
         // Левый верхний угол
         if (pos.left + x >= x1 && pos.left + x <= x2 && pos.top + y >= y1 && pos.top + y <= y2) {
