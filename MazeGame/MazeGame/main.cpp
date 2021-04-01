@@ -8,10 +8,10 @@
 
 using namespace sf;
 
-int WINDOW_WIDTH = 800;
-int WINDOW_HEIGHT = 850;
-int GAME_WIDTH = 800;
-int GAME_HEIGHT = 800;
+int WINDOW_WIDTH = 600;
+int WINDOW_HEIGHT = 650;
+int GAME_WIDTH = 600;
+int GAME_HEIGHT = 600;
 std::string theme;
 // Здесь должны быть объявлены все функции, находящиеся в этом файле (конечно, кроме main)
 void load_level(int num);
@@ -140,7 +140,7 @@ void Menu()
         else { exit.setFillColor(Color(0, 7, 77)); }
         if (Mouse::isButtonPressed(Mouse::Left))
         {
-            if (MenuNum == 1) { isMenu = false; game_run(); }
+            if (MenuNum == 1) { window.close(); isMenu = false; game_run(); }
             if (MenuNum == 2) isMenu = false;
             if (MenuNum == 3) { window.close(); isMenu = false; }
         }
