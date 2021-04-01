@@ -12,10 +12,11 @@ using namespace sf;
 class Character
 {
 public:
-    Texture characterTexture;
+    Texture characterTexture1;
+    Texture characterTexture2;
     Sprite characterSprite;
     Character() {};
-    void make_sprite(float x, float y, float size);
+    void make_sprite(std::string theme, float x, float y, float size);
     bool can_move(std::vector <Sprite> borderSprites, int x, int y);
 };
 #endif

@@ -93,7 +93,7 @@ void load_level(int num) {
             }
             else if (level_map[i][j] == '@') {
                 roadSprites.push_back(fieldSprite);
-                character.make_sprite(j * block_size, i * block_size + WINDOW_HEIGHT - GAME_HEIGHT, block_size * 0.7);
+                character.make_sprite(theme, j * block_size, i * block_size + WINDOW_HEIGHT - GAME_HEIGHT, block_size * 0.7);
             }
         }
     }
@@ -222,6 +222,12 @@ void game_run()
         }
         for (Sprite elem : roadSprites) {
             window.draw(elem);
+        }
+        if (FRAME_NUMBER % 15 < 7) {
+            character.characterSprite.setTexture(character.characterTexture1);
+        }
+        else {
+            character.characterSprite.setTexture(character.characterTexture2);
         }
         window.draw(character.characterSprite);
 

@@ -3,13 +3,15 @@
 #include <vector>
 using namespace sf;
 
-void Character::make_sprite(float x, float y, float size)
+void Character::make_sprite(std::string theme, float x, float y, float size)
 {
-    characterTexture.loadFromFile("data/images/character.png");
-    characterTexture.setSmooth(true);
-    characterSprite.setTexture(characterTexture);
+    characterTexture1.loadFromFile("data/images/" + theme + "_character1.png");
+    characterTexture1.setSmooth(true);
+    characterTexture2.loadFromFile("data/images/" + theme + "_character2.png");
+    characterTexture2.setSmooth(true);
+    characterSprite.setTexture(characterTexture1);
     characterSprite.setPosition(x, y);
-    characterSprite.setScale(size / characterTexture.getSize().x, size / characterTexture.getSize().x);
+    characterSprite.setScale(size / characterTexture1.getSize().x, size / characterTexture1.getSize().x);
 }
 
 bool Character::can_move(std::vector <Sprite> borderSprites, int x, int y) {
