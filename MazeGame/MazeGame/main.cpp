@@ -16,6 +16,7 @@ std::string theme;
 // Здесь должны быть объявлены все функции, находящиеся в этом файле (конечно, кроме main)
 void load_level(int num);
 void game_run();
+void Menu();
 
 std::vector <std::vector <char>> level_map; // Двумерный массив для хранения знаков уровня
 // # - граница; . - дорога; @ - дорога, начальное положение персонажа
@@ -26,7 +27,8 @@ std::vector <Sprite> roadSprites;
 Character character;
 
 int main() {
-    game_run();
+    //game_run();
+    Menu();
     return 0;
 }
 
@@ -94,6 +96,58 @@ void load_level(int num) {
                 character.make_sprite(j * block_size, i * block_size + WINDOW_HEIGHT - GAME_HEIGHT, block_size * 0.7);
             }
         }
+    }
+}
+
+
+void Menu()
+{
+    RenderWindow window(VideoMode(350, 300), "SFML works!");
+    Font font;
+    font.loadFromFile("./data/fonts/Roboto-Regular.ttf");
+    Text start("Start", font, 70);
+    start.setFillColor(Color(0, 7, 77));
+    Text score("Score", font, 70);
+    score.setFillColor(Color(0, 7, 77));
+    Text exit("Exit", font, 70);
+    exit.setFillColor(Color(0, 7, 77));
+    start.setPosition(100, 30);
+    score.setPosition(100, 90);
+    exit.setPosition(100, 150);
+    bool isMenu = 1;
+    int MenuNum = 0;
+
+    //while (window.isOpen())
+
+    while (isMenu)
+    {
+        Event event;
+        while (window.pollEvent(event)) {
+            switch (event.type) {
+            case Event::Closed:
+                window.close();
+                break;
+            }
+        }
+
+        MenuNum = 0;
+        window.clear(Color(129, 181, 221));
+        if (IntRect(100, 30, 300, 50).contains(Mouse::getPosition(window))) { start.setFillColor(Color::Blue); MenuNum = 1; }
+        else { start.setFillColor(Color(0, 7, 77)); }
+        if (IntRect(100, 90, 300, 50).contains(Mouse::getPosition(window))) { score.setFillColor(Color::Blue); MenuNum = 2; }
+        else { score.setFillColor(Color(0, 7, 77)); }
+        if (IntRect(100, 150, 300, 50).contains(Mouse::getPosition(window))) { exit.setFillColor(Color::Blue); MenuNum = 3; }
+        else { exit.setFillColor(Color(0, 7, 77)); }
+        if (Mouse::isButtonPressed(Mouse::Left))
+        {
+            if (MenuNum == 1) isMenu = false;
+            if (MenuNum == 2) isMenu = false;
+            if (MenuNum == 3) { window.close(); isMenu = false; }
+        }
+        window.draw(start);
+        window.draw(score);
+        window.draw(exit);
+        window.display();
     }
 }
 
