@@ -104,7 +104,7 @@ void load_level(int num) {
             }
             else if (level_map[i][j] == '#') {
                 borderSprites.push_back(fieldSprite);
-                if ((i + j) % 7 == 3) {
+                if ((i + j) % 5 == rand() % 5) {
                     Sprite stuffSprite;
                     stuffSprite.setTexture(stuffTextures[k]);
                     stuffSprite.setPosition(i * block_size, j * block_size + SPACE_HEIGHT - block_size * 0.3);
@@ -124,7 +124,7 @@ void load_level(int num) {
 
 void Menu()
 {
-    RenderWindow window(VideoMode(350, 300), "SFML works!");
+    RenderWindow window(VideoMode(350, 300), "Maze game - menu");
     Font font;
     font.loadFromFile("./data/fonts/Roboto-Regular.ttf");
     Text start("Start", font, 70);
@@ -184,8 +184,8 @@ void game_run()
     bool PLAY = true;
     HEIGHT = VideoMode::getDesktopMode().height - SPACE_HEIGHT * 4;
     WIDTH = HEIGHT;
-    
-    RenderWindow window(VideoMode(WIDTH, HEIGHT + SPACE_HEIGHT), "Maze");
+
+    RenderWindow window(VideoMode(WIDTH, HEIGHT + SPACE_HEIGHT), "Maze game");
     window.setPosition(sf::Vector2i(0, 0));
     window.setFramerateLimit(30);
 
@@ -206,7 +206,7 @@ void game_run()
                 window.close();
                 break;
 
-            
+
             }
 
         }
@@ -227,6 +227,7 @@ void game_run()
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
             if (character.characterSprite.getPosition().x > 0) {
+                character.turn("left");
                 if (character.can_move(borderSprites, -SPEED, 0)) {
                     character.characterSprite.move(-SPEED, 0);
                 }
@@ -236,6 +237,7 @@ void game_run()
             if (character.characterSprite.getPosition().x + character.characterSprite.getGlobalBounds().width < WIDTH) {
                 if (character.can_move(borderSprites, SPEED, 0)) {
                     character.characterSprite.move(SPEED, 0);
+                    character.turn("right");
                 }
             }
         }

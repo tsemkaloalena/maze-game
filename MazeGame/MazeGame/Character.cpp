@@ -47,3 +47,17 @@ bool Character::can_move(std::vector <Sprite> borderSprites, int x, int y) {
     }
     return true;
 }
+
+void Character::turn(std::string direction) {
+    if (side != direction) {
+        side = direction;
+        Vector2f scale = characterSprite.getScale();
+        characterSprite.setScale(-scale.x, scale.y);
+        if (direction == "right") {
+            characterSprite.move(-characterSprite.getGlobalBounds().width, 0);
+        }
+        else {
+            characterSprite.move(characterSprite.getGlobalBounds().width, 0);
+        }
+    }
+}
