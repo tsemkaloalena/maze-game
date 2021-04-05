@@ -26,6 +26,8 @@ std::vector <Sprite> roadSprites;
 std::string* stuffImages = new std::string[3];
 std::vector <Texture> stuffTextures;
 std::vector <Sprite> stuffSprites;
+Texture finishTexture;
+Sprite finishSprite;
 
 
 Character character;
@@ -45,6 +47,9 @@ void load_level(int num) {
     borderSprites.shrink_to_fit();
     roadSprites.shrink_to_fit();
     fieldTextures.shrink_to_fit();
+
+    finishTexture.loadFromFile("data/images/finish.png");
+    finishSprite.setTexture(finishTexture);
 
     // Считывание из текстового файла, причём файл называется "<номер уровня>.txt"
     std::string number = std::to_string(num);
@@ -73,7 +78,7 @@ void load_level(int num) {
         fieldTextures.push_back(std::vector<Texture>());
         for (int j = 0; j < level_map[i].size(); j++) {
             Texture fieldTexture;
-            if (level_map[i][j] == '.' or level_map[i][j] == '@') {
+            if (level_map[i][j] == '.' or level_map[i][j] == '@' or level_map[i][j] == 'f') {
                 type = "road";
             }
             else if (level_map[i][j] == '#') {
@@ -116,6 +121,11 @@ void load_level(int num) {
             else if (level_map[i][j] == '@') {
                 roadSprites.push_back(fieldSprite);
                 character.make_sprite(theme, j * block_size, i * block_size + SPACE_HEIGHT, block_size * 0.8);
+            }
+            else if (level_map[i][j] == 'f') {
+                roadSprites.push_back(fieldSprite);
+                finishSprite.setScale(block_size / finishTexture.getSize().x, block_size / finishTexture.getSize().y);
+                finishSprite.setPosition(j * block_size, i * block_size + SPACE_HEIGHT);
             }
         }
     }
@@ -261,6 +271,7 @@ void game_run()
         for (Sprite elem : stuffSprites) {
             window.draw(elem);
         }
+        window.draw(finishSprite);
 
         FRAME_NUMBER++;
         if (FRAME_NUMBER % 30 == 0) {
