@@ -212,21 +212,21 @@ void game_run()
         }
 
         if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
-            if (character.characterSprite.getPosition().y > SPACE_HEIGHT) {
+            if (character.characterSprite.getGlobalBounds().top > SPACE_HEIGHT) {
                 if (character.can_move(borderSprites, 0, -SPEED)) {
                     character.characterSprite.move(0, -SPEED);
                 }
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Down)) {
-            if (character.characterSprite.getPosition().y + character.characterSprite.getGlobalBounds().height < HEIGHT + SPACE_HEIGHT) {
+            if (character.characterSprite.getGlobalBounds().top + character.characterSprite.getGlobalBounds().height < HEIGHT + SPACE_HEIGHT) {
                 if (character.can_move(borderSprites, 0, SPEED)) {
                     character.characterSprite.move(0, SPEED);
                 }
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-            if (character.characterSprite.getPosition().x > 0) {
+            if (character.characterSprite.getGlobalBounds().left > 0) {
                 character.turn("left");
                 if (character.can_move(borderSprites, -SPEED, 0)) {
                     character.characterSprite.move(-SPEED, 0);
@@ -234,7 +234,7 @@ void game_run()
             }
         }
         if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-            if (character.characterSprite.getPosition().x + character.characterSprite.getGlobalBounds().width < WIDTH) {
+            if (character.characterSprite.getGlobalBounds().left + character.characterSprite.getGlobalBounds().width < WIDTH) {
                 if (character.can_move(borderSprites, SPEED, 0)) {
                     character.characterSprite.move(SPEED, 0);
                     character.turn("right");
