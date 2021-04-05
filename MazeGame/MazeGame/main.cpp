@@ -96,7 +96,7 @@ void load_level(int num) {
         for (int j = 0; j < level_map[i].size(); j++) {
             Sprite fieldSprite;
             fieldSprite.setTexture(fieldTextures[i][j]);
-            fieldSprite.setPosition(i * block_size, j * block_size + SPACE_HEIGHT);
+            fieldSprite.setPosition(j * block_size, i * block_size + SPACE_HEIGHT);
             fieldSprite.setScale(block_size / fieldTextures[i][j].getSize().x, block_size / fieldTextures[i][j].getSize().x);
 
             if (level_map[i][j] == '.') {
@@ -107,7 +107,7 @@ void load_level(int num) {
                 if ((i + j) % 5 == rand() % 5) {
                     Sprite stuffSprite;
                     stuffSprite.setTexture(stuffTextures[k]);
-                    stuffSprite.setPosition(i * block_size, j * block_size + SPACE_HEIGHT - block_size * 0.3);
+                    stuffSprite.setPosition(j * block_size, i * block_size + SPACE_HEIGHT - block_size * 0.3);
                     stuffSprite.setScale(block_size / stuffTextures[k].getSize().x, block_size / stuffTextures[k].getSize().x);
                     stuffSprites.push_back(stuffSprite);
                     k++;
