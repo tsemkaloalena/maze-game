@@ -32,6 +32,76 @@ Sprite finishSprite;
 
 Character character;
 
+class Enemy
+{
+public:
+    std::string side = "right";
+    Texture enemyTexture1;
+    Texture enemyTexture2;
+    Sprite enemySprite;
+    Enemy() {};
+    void make_sprite(std::string theme, float x, float y, float size)
+    {
+        enemyTexture1.loadFromFile("data/images/winter_monster1.png");
+        //characterTexture1.setSmooth(true);
+        enemyTexture2.loadFromFile("data/images/winter_monster2.png");
+        //characterTexture2.setSmooth(true);
+        enemySprite.setTexture(enemyTexture1);
+        enemySprite.setPosition(x, y);
+        enemySprite.setScale(size / enemyTexture1.getSize().y, size / enemyTexture1.getSize().y);
+    }
+
+    bool can_move(std::vector <Sprite> borderSprites, int x, int y) {
+        FloatRect pos = enemySprite.getGlobalBounds();
+        int x1, x2, y1, y2;
+        FloatRect block;
+        for (Sprite elem : borderSprites) {
+            block = elem.getGlobalBounds();
+            x1 = block.left;
+            x2 = block.left + block.width;
+            y1 = block.top;
+            y2 = block.top + block.height;
+
+            // Левый верхний угол
+            if (pos.left + x >= x1 && pos.left + x <= x2 && pos.top + y >= y1 && pos.top + y <= y2 - block.height * 0.2) {
+                return false;
+            }
+
+            // Левый нижний угол
+            if (pos.left + x >= x1 && pos.left + x <= x2 && pos.top + y + pos.height >= y1 && pos.top + y + pos.height <= y2) {
+                return false;
+            }
+
+            // Правый верхний угол
+            if (pos.left + x + pos.width >= x1 && pos.left + x + pos.width <= x2 && pos.top + y >= y1 && pos.top + y <= y2 - block.height * 0.2) {
+                return false;
+            }
+
+            // Правый нижний угол
+            if (pos.left + x + pos.width >= x1 && pos.left + x + pos.width <= x2 && pos.top + y + pos.height >= y1 && pos.top + y + pos.height <= y2) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void turn(std::string direction) {
+        if (side != direction) {
+            side = direction;
+            Vector2f scale = enemySprite.getScale();
+            enemySprite.setScale(-scale.x, scale.y);
+            if (direction == "right") {
+                enemySprite.move(-enemySprite.getGlobalBounds().width, 0);
+            }
+            else {
+                enemySprite.move(enemySprite.getGlobalBounds().width, 0);
+            }
+        }
+    }
+
+};
+Enemy enemy1;
+Enemy enemy2;
 int main() {
     //game_run();
     Menu();
@@ -78,7 +148,7 @@ void load_level(int num) {
         fieldTextures.push_back(std::vector<Texture>());
         for (int j = 0; j < level_map[i].size(); j++) {
             Texture fieldTexture;
-            if (level_map[i][j] == '.' or level_map[i][j] == '@' or level_map[i][j] == 'f') {
+            if (level_map[i][j] == '.' or level_map[i][j] == '@' or level_map[i][j] == 'f' or level_map[i][j] == 'm' or level_map[i][j] == 'e') {
                 type = "road";
             }
             else if (level_map[i][j] == '#') {
@@ -121,6 +191,14 @@ void load_level(int num) {
             else if (level_map[i][j] == '@') {
                 roadSprites.push_back(fieldSprite);
                 character.make_sprite(theme, j * block_size, i * block_size + SPACE_HEIGHT, block_size * 0.8);
+            }
+            else if (level_map[i][j] == 'm') {
+                roadSprites.push_back(fieldSprite);
+                enemy1.make_sprite(theme, j * block_size, i * block_size + SPACE_HEIGHT, block_size * 0.8);
+            }
+            else if (level_map[i][j] == 'e') {
+                roadSprites.push_back(fieldSprite);
+                enemy2.make_sprite(theme, j * block_size, i * block_size + SPACE_HEIGHT, block_size * 0.8);
             }
             else if (level_map[i][j] == 'f') {
                 roadSprites.push_back(fieldSprite);
@@ -251,7 +329,38 @@ void game_run()
                 }
             }
         }
+        if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
+            if (enemy1.enemySprite.getGlobalBounds().left + enemy1.enemySprite.getGlobalBounds().width < WIDTH) {
+                if (enemy1.can_move(borderSprites, SPEED, 0)) {
+                    enemy1.enemySprite.move(SPEED, 0);
+                    enemy1.turn("right");
+                }
+            }
+        }
+        if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
+            if (enemy1.enemySprite.getGlobalBounds().left > 0) {
+                enemy1.turn("left");
+                if (enemy1.can_move(borderSprites, -SPEED, 0)) {
+                    enemy1.enemySprite.move(-SPEED, 0);
+                }
+            }
+        }
 
+
+        if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
+            if (enemy2.enemySprite.getGlobalBounds().top > SPACE_HEIGHT) {
+                if (enemy2.can_move(borderSprites, 0, -SPEED)) {
+                    enemy2.enemySprite.move(0, -SPEED);
+                }
+            }
+        }
+        if (Keyboard::isKeyPressed(Keyboard::Key::Down)) {
+            if (enemy2.enemySprite.getGlobalBounds().top + character.characterSprite.getGlobalBounds().height < HEIGHT + SPACE_HEIGHT) {
+                if (enemy2.can_move(borderSprites, 0, SPEED)) {
+                    enemy2.enemySprite.move(0, SPEED);
+                }
+            }
+        }
         window.clear(Color(218, 255, 88));
 
         for (Sprite elem : borderSprites) {
@@ -268,6 +377,21 @@ void game_run()
         }
         window.draw(character.characterSprite);
 
+        if (FRAME_NUMBER % 15 < 7) {
+            enemy1.enemySprite.setTexture(enemy1.enemyTexture1);
+        }
+        else {
+            enemy1.enemySprite.setTexture(enemy1.enemyTexture2);
+        }
+        window.draw(enemy1.enemySprite);
+
+        if (FRAME_NUMBER % 15 < 7) {
+            enemy2.enemySprite.setTexture(enemy2.enemyTexture1);
+        }
+        else {
+            enemy2.enemySprite.setTexture(enemy2.enemyTexture2);
+        }
+        window.draw(enemy2.enemySprite);
         for (Sprite elem : stuffSprites) {
             window.draw(elem);
         }
