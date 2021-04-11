@@ -1,4 +1,5 @@
 ﻿#include "Character.h"
+#include "Enemy.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <string>
@@ -29,79 +30,11 @@ std::vector <Sprite> stuffSprites;
 Texture finishTexture;
 Sprite finishSprite;
 
-
 Character character;
 
-class Enemy
-{
-public:
-    std::string side = "right";
-    Texture enemyTexture1;
-    Texture enemyTexture2;
-    Sprite enemySprite;
-    Enemy() {};
-    void make_sprite(std::string theme, float x, float y, float size)
-    {
-        enemyTexture1.loadFromFile("data/images/winter_monster1.png");
-        //characterTexture1.setSmooth(true);
-        enemyTexture2.loadFromFile("data/images/winter_monster2.png");
-        //characterTexture2.setSmooth(true);
-        enemySprite.setTexture(enemyTexture1);
-        enemySprite.setPosition(x, y);
-        enemySprite.setScale(size / enemyTexture1.getSize().y, size / enemyTexture1.getSize().y);
-    }
+std::vector<Enemy> horizontalEnemies;
+std::vector<Enemy> verticalEnemies;
 
-    bool can_move(std::vector <Sprite> borderSprites, int x, int y) {
-        FloatRect pos = enemySprite.getGlobalBounds();
-        int x1, x2, y1, y2;
-        FloatRect block;
-        for (Sprite elem : borderSprites) {
-            block = elem.getGlobalBounds();
-            x1 = block.left;
-            x2 = block.left + block.width;
-            y1 = block.top;
-            y2 = block.top + block.height;
-
-            // Левый верхний угол
-            if (pos.left + x >= x1 && pos.left + x <= x2 && pos.top + y >= y1 && pos.top + y <= y2 - block.height * 0.2) {
-                return false;
-            }
-
-            // Левый нижний угол
-            if (pos.left + x >= x1 && pos.left + x <= x2 && pos.top + y + pos.height >= y1 && pos.top + y + pos.height <= y2) {
-                return false;
-            }
-
-            // Правый верхний угол
-            if (pos.left + x + pos.width >= x1 && pos.left + x + pos.width <= x2 && pos.top + y >= y1 && pos.top + y <= y2 - block.height * 0.2) {
-                return false;
-            }
-
-            // Правый нижний угол
-            if (pos.left + x + pos.width >= x1 && pos.left + x + pos.width <= x2 && pos.top + y + pos.height >= y1 && pos.top + y + pos.height <= y2) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    void turn(std::string direction) {
-        if (side != direction) {
-            side = direction;
-            Vector2f scale = enemySprite.getScale();
-            enemySprite.setScale(-scale.x, scale.y);
-            if (direction == "right") {
-                enemySprite.move(-enemySprite.getGlobalBounds().width, 0);
-            }
-            else {
-                enemySprite.move(enemySprite.getGlobalBounds().width, 0);
-            }
-        }
-    }
-
-};
-Enemy enemy1;
-Enemy enemy2;
 int main() {
     //game_run();
     Menu();
@@ -148,7 +81,7 @@ void load_level(int num) {
         fieldTextures.push_back(std::vector<Texture>());
         for (int j = 0; j < level_map[i].size(); j++) {
             Texture fieldTexture;
-            if (level_map[i][j] == '.' or level_map[i][j] == '@' or level_map[i][j] == 'f' or level_map[i][j] == 'm' or level_map[i][j] == 'e') {
+            if (level_map[i][j] == '.' or level_map[i][j] == '@' or level_map[i][j] == 'f' or level_map[i][j] == 'v' or level_map[i][j] == 'h') {
                 type = "road";
             }
             else if (level_map[i][j] == '#') {
@@ -159,13 +92,22 @@ void load_level(int num) {
                     stuffTextures.push_back(stuffTexture);
                 }
             }
+            if (level_map[i][j] == 'h') {
+                Enemy enemy;
+                horizontalEnemies.push_back(enemy);
+            }
+            else if (level_map[i][j] == 'v') {
+                Enemy enemy;
+                verticalEnemies.push_back(enemy);
+            }
+
             fieldTexture.loadFromFile("data/images/" + theme + "_" + type + ".jpg");
             fieldTextures[i].push_back(fieldTexture);
         }
     }
 
     // Запись спрайтов в 2 вектора (границы и дорога)
-    int k = 0;
+    int k = 0, vmonst = 0, hmonst = 0;
     float block_size = (float)HEIGHT / level_map[0].size();
     for (int i = 0; i < level_map.size(); i++) {
         for (int j = 0; j < level_map[i].size(); j++) {
@@ -192,13 +134,16 @@ void load_level(int num) {
                 roadSprites.push_back(fieldSprite);
                 character.make_sprite(theme, j * block_size, i * block_size + SPACE_HEIGHT, block_size * 0.8);
             }
-            else if (level_map[i][j] == 'm') {
+            else if (level_map[i][j] == 'v') {
                 roadSprites.push_back(fieldSprite);
-                enemy1.make_sprite(theme, j * block_size, i * block_size + SPACE_HEIGHT, block_size * 0.8);
+                verticalEnemies[vmonst].make_sprite("up", theme, j * block_size + 0.1 * block_size, i * block_size + 0.1 * block_size + SPACE_HEIGHT, block_size * 0.8);
+                vmonst++;
+                
             }
-            else if (level_map[i][j] == 'e') {
+            else if (level_map[i][j] == 'h') {
                 roadSprites.push_back(fieldSprite);
-                enemy2.make_sprite(theme, j * block_size, i * block_size + SPACE_HEIGHT, block_size * 0.8);
+                horizontalEnemies[hmonst].make_sprite("right", theme, j * block_size + 0.1 * block_size, i * block_size + 0.1 * block_size + SPACE_HEIGHT, block_size * 0.8);
+                hmonst++;
             }
             else if (level_map[i][j] == 'f') {
                 roadSprites.push_back(fieldSprite);
@@ -231,33 +176,33 @@ void Menu()
 
     while (isMenu)
     {
-        Event event;
-        while (window.pollEvent(event)) {
-            switch (event.type) {
-            case Event::Closed:
-                window.close();
-                break;
-            }
+    Event event;
+    while (window.pollEvent(event)) {
+        switch (event.type) {
+        case Event::Closed:
+            window.close();
+            break;
         }
+    }
 
-        MenuNum = 0;
-        window.clear(Color(129, 181, 221));
-        if (IntRect(100, 30, 300, 50).contains(Mouse::getPosition(window))) { start.setFillColor(Color::Blue); MenuNum = 1; }
-        else { start.setFillColor(Color(0, 7, 77)); }
-        if (IntRect(100, 90, 300, 50).contains(Mouse::getPosition(window))) { score.setFillColor(Color::Blue); MenuNum = 2; }
-        else { score.setFillColor(Color(0, 7, 77)); }
-        if (IntRect(100, 150, 300, 50).contains(Mouse::getPosition(window))) { exit.setFillColor(Color::Blue); MenuNum = 3; }
-        else { exit.setFillColor(Color(0, 7, 77)); }
-        if (Mouse::isButtonPressed(Mouse::Left))
-        {
-            if (MenuNum == 1) { window.close(); isMenu = false; game_run(); }
-            if (MenuNum == 2) isMenu = false;
-            if (MenuNum == 3) { window.close(); isMenu = false; }
-        }
-        window.draw(start);
-        window.draw(score);
-        window.draw(exit);
-        window.display();
+    MenuNum = 0;
+    window.clear(Color(129, 181, 221));
+    if (IntRect(100, 30, 300, 50).contains(Mouse::getPosition(window))) { start.setFillColor(Color::Blue); MenuNum = 1; }
+    else { start.setFillColor(Color(0, 7, 77)); }
+    if (IntRect(100, 90, 300, 50).contains(Mouse::getPosition(window))) { score.setFillColor(Color::Blue); MenuNum = 2; }
+    else { score.setFillColor(Color(0, 7, 77)); }
+    if (IntRect(100, 150, 300, 50).contains(Mouse::getPosition(window))) { exit.setFillColor(Color::Blue); MenuNum = 3; }
+    else { exit.setFillColor(Color(0, 7, 77)); }
+    if (Mouse::isButtonPressed(Mouse::Left))
+    {
+        if (MenuNum == 1) { window.close(); isMenu = false; game_run(); }
+        if (MenuNum == 2) isMenu = false;
+        if (MenuNum == 3) { window.close(); isMenu = false; }
+    }
+    window.draw(start);
+    window.draw(score);
+    window.draw(exit);
+    window.display();
     }
 }
 
@@ -329,38 +274,16 @@ void game_run()
                 }
             }
         }
-        if (Keyboard::isKeyPressed(Keyboard::Key::Right)) {
-            if (enemy1.enemySprite.getGlobalBounds().left + enemy1.enemySprite.getGlobalBounds().width < WIDTH) {
-                if (enemy1.can_move(borderSprites, SPEED, 0)) {
-                    enemy1.enemySprite.move(SPEED, 0);
-                    enemy1.turn("right");
-                }
-            }
-        }
-        if (Keyboard::isKeyPressed(Keyboard::Key::Left)) {
-            if (enemy1.enemySprite.getGlobalBounds().left > 0) {
-                enemy1.turn("left");
-                if (enemy1.can_move(borderSprites, -SPEED, 0)) {
-                    enemy1.enemySprite.move(-SPEED, 0);
-                }
-            }
-        }
 
+        for (int i = 0; i < horizontalEnemies.size(); i++) {
+            horizontalEnemies[i].enemy_move(borderSprites, SPEED, SPACE_HEIGHT, HEIGHT, WIDTH);
+        }
+        for (int i = 0; i < verticalEnemies.size(); i++) {
+            verticalEnemies[i].enemy_move(borderSprites, SPEED, SPACE_HEIGHT, HEIGHT, WIDTH);
+        }
+        
+        
 
-        if (Keyboard::isKeyPressed(Keyboard::Key::Up)) {
-            if (enemy2.enemySprite.getGlobalBounds().top > SPACE_HEIGHT) {
-                if (enemy2.can_move(borderSprites, 0, -SPEED)) {
-                    enemy2.enemySprite.move(0, -SPEED);
-                }
-            }
-        }
-        if (Keyboard::isKeyPressed(Keyboard::Key::Down)) {
-            if (enemy2.enemySprite.getGlobalBounds().top + character.characterSprite.getGlobalBounds().height < HEIGHT + SPACE_HEIGHT) {
-                if (enemy2.can_move(borderSprites, 0, SPEED)) {
-                    enemy2.enemySprite.move(0, SPEED);
-                }
-            }
-        }
         window.clear(Color(218, 255, 88));
 
         for (Sprite elem : borderSprites) {
@@ -378,20 +301,29 @@ void game_run()
         window.draw(character.characterSprite);
 
         if (FRAME_NUMBER % 15 < 7) {
-            enemy1.enemySprite.setTexture(enemy1.enemyTexture1);
+            for (int i = 0; i < horizontalEnemies.size(); i++) {
+                horizontalEnemies[i].enemySprite.setTexture(horizontalEnemies[i].enemyTexture1);
+            }
+            for (int i = 0; i < verticalEnemies.size(); i++) {
+                verticalEnemies[i].enemySprite.setTexture(verticalEnemies[i].enemyTexture1);
+            }
         }
         else {
-            enemy1.enemySprite.setTexture(enemy1.enemyTexture2);
+            for (int i = 0; i < horizontalEnemies.size(); i++) {
+                horizontalEnemies[i].enemySprite.setTexture(horizontalEnemies[i].enemyTexture2);
+            }
+            for (int i = 0; i < verticalEnemies.size(); i++) {
+                verticalEnemies[i].enemySprite.setTexture(verticalEnemies[i].enemyTexture2);
+            }
         }
-        window.draw(enemy1.enemySprite);
 
-        if (FRAME_NUMBER % 15 < 7) {
-            enemy2.enemySprite.setTexture(enemy2.enemyTexture1);
+        for (Enemy elem : horizontalEnemies) {
+            window.draw(elem.enemySprite);
         }
-        else {
-            enemy2.enemySprite.setTexture(enemy2.enemyTexture2);
+        for (Enemy elem : verticalEnemies) {
+            window.draw(elem.enemySprite);
         }
-        window.draw(enemy2.enemySprite);
+
         for (Sprite elem : stuffSprites) {
             window.draw(elem);
         }
