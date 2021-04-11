@@ -86,7 +86,7 @@ void load_level(int num) {
             }
             else if (level_map[i][j] == '#') {
                 type = "border";
-                if ((i + j) % 7 == 3) {
+                if ((i + j) % 5 == 3) {
                     Texture stuffTexture;
                     stuffTexture.loadFromFile(stuffImages[rand() % 3]);
                     stuffTextures.push_back(stuffTexture);
@@ -121,7 +121,7 @@ void load_level(int num) {
             }
             else if (level_map[i][j] == '#') {
                 borderSprites.push_back(fieldSprite);
-                if ((i + j) % 5 == rand() % 5) {
+                if ((i + j) % 5 == 3) {
                     Sprite stuffSprite;
                     stuffSprite.setTexture(stuffTextures[k]);
                     stuffSprite.setPosition(j * block_size, i * block_size + SPACE_HEIGHT - block_size * 0.3);
@@ -210,11 +210,13 @@ void Menu()
 // Функция с процессом игры
 void game_run()
 {
+    int life = 3;
     float SPEED = 5.0;
     int FRAME_NUMBER = 0;
     int TIMER = 0;
     bool SCORE_RECORDED = false;
     bool PLAY = true;
+    bool WIN = false;
     HEIGHT = VideoMode::getDesktopMode().height - SPACE_HEIGHT * 4;
     WIDTH = HEIGHT;
 
@@ -282,7 +284,29 @@ void game_run()
             verticalEnemies[i].enemy_move(borderSprites, SPEED, SPACE_HEIGHT, HEIGHT, WIDTH);
         }
         
-        
+        for(Enemy elem : verticalEnemies)
+        {
+            if (character.characterSprite.getGlobalBounds().intersects(elem.enemySprite.getGlobalBounds()))
+            {
+                life--;
+                break;
+            }
+        }
+        for (Enemy elem : horizontalEnemies)
+        {
+            if (character.characterSprite.getGlobalBounds().intersects(elem.enemySprite.getGlobalBounds()))
+            {
+                life--;
+                break;
+            }
+        }
+        std::stringstream ss;
+        ss << life;
+        timerText.setString(ss.str());
+        if (life <= 0)
+        {
+            PLAY = false;
+        }
 
         window.clear(Color(218, 255, 88));
 
@@ -333,9 +357,9 @@ void game_run()
         if (FRAME_NUMBER % 30 == 0) {
             TIMER++;
         }
-        std::stringstream ss;
+        /*std::stringstream ss;
         ss << TIMER;
-        timerText.setString(ss.str());
+        timerText.setString(ss.str());*/
         window.draw(timerText);
 
         window.display();

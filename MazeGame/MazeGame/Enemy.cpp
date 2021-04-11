@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include <time.h>
 #include <SFML/Graphics.hpp>
 #include <vector>
 using namespace sf;
@@ -6,10 +7,21 @@ using namespace sf;
 void Enemy::make_sprite(std::string direction, std::string theme, float x, float y, float size)
 {
     this->direction = direction;
-    enemyTexture1.loadFromFile("data/images/" + theme + "_monster1.png");
-    //characterTexture1.setSmooth(true);
-    enemyTexture2.loadFromFile("data/images/" + theme + "_monster2.png");
-    //characterTexture2.setSmooth(true);
+    srand(time(NULL));
+    if (rand() % 2 == 0)
+    {
+        enemyTexture1.loadFromFile("data/images/" + theme + "_monster1.png");
+        //characterTexture1.setSmooth(true);
+        enemyTexture2.loadFromFile("data/images/" + theme + "_monster2.png");
+        //characterTexture2.setSmooth(true);
+    }
+    else
+    {
+        enemyTexture1.loadFromFile("data/images/monster1.png");
+        //characterTexture1.setSmooth(true);
+        enemyTexture2.loadFromFile("data/images/monster2.png");
+        //characterTexture2.setSmooth(true);
+    }
     enemySprite.setTexture(enemyTexture1);
     enemySprite.setPosition(x, y);
     enemySprite.setScale(size / enemyTexture1.getSize().y, size / enemyTexture1.getSize().y);
