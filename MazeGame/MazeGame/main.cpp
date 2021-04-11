@@ -211,6 +211,8 @@ void Menu()
 void game_run()
 {
     int life = 3;
+    std::vector <bool> v_intersected;
+    std::vector <bool> h_intersected;
     float SPEED = 5.0;
     int FRAME_NUMBER = 0;
     int TIMER = 0;
@@ -225,6 +227,13 @@ void game_run()
     window.setFramerateLimit(30);
 
     load_level(1);
+
+    for (Enemy elem : verticalEnemies) {
+        v_intersected.push_back(false);
+    }
+    for (Enemy elem : horizontalEnemies) {
+        h_intersected.push_back(false);
+    }
 
     Font font;
     font.loadFromFile("./data/fonts/HotMustardBTNPosterRegular.ttf");
@@ -279,27 +288,25 @@ void game_run()
 
         for (int i = 0; i < horizontalEnemies.size(); i++) {
             horizontalEnemies[i].enemy_move(borderSprites, SPEED, SPACE_HEIGHT, HEIGHT, WIDTH);
+            if (!h_intersected[i] && character.characterSprite.getGlobalBounds().intersects(horizontalEnemies[i].enemySprite.getGlobalBounds())) {
+                life--;
+                h_intersected[i] = true;
+            }
+            else if (!(character.characterSprite.getGlobalBounds().intersects(horizontalEnemies[i].enemySprite.getGlobalBounds()))) {
+                h_intersected[i] = false;
+            }
         }
         for (int i = 0; i < verticalEnemies.size(); i++) {
             verticalEnemies[i].enemy_move(borderSprites, SPEED, SPACE_HEIGHT, HEIGHT, WIDTH);
-        }
-        
-        for(Enemy elem : verticalEnemies)
-        {
-            if (character.characterSprite.getGlobalBounds().intersects(elem.enemySprite.getGlobalBounds()))
-            {
+            if (!v_intersected[i] && character.characterSprite.getGlobalBounds().intersects(verticalEnemies[i].enemySprite.getGlobalBounds())) {
                 life--;
-                break;
+                v_intersected[i] = true;
+            }
+            else if (!(character.characterSprite.getGlobalBounds().intersects(verticalEnemies[i].enemySprite.getGlobalBounds()))) {
+                v_intersected[i] = false;
             }
         }
-        for (Enemy elem : horizontalEnemies)
-        {
-            if (character.characterSprite.getGlobalBounds().intersects(elem.enemySprite.getGlobalBounds()))
-            {
-                life--;
-                break;
-            }
-        }
+
         std::stringstream ss;
         ss << life;
         timerText.setString(ss.str());
