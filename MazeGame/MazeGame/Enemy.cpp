@@ -6,9 +6,9 @@ using namespace sf;
 void Enemy::make_sprite(std::string direction, std::string theme, float x, float y, float size)
 {
     this->direction = direction;
-    enemyTexture1.loadFromFile("data/images/winter_monster1.png");
+    enemyTexture1.loadFromFile("data/images/" + theme + "_monster1.png");
     //characterTexture1.setSmooth(true);
-    enemyTexture2.loadFromFile("data/images/winter_monster2.png");
+    enemyTexture2.loadFromFile("data/images/" + theme + "_monster2.png");
     //characterTexture2.setSmooth(true);
     enemySprite.setTexture(enemyTexture1);
     enemySprite.setPosition(x, y);
