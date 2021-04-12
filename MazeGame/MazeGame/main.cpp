@@ -2,6 +2,7 @@
 #include "Enemy.h"
 #include <iostream>
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -210,6 +211,9 @@ void Menu()
 // Функция с процессом игры
 void game_run()
 {
+    Music music;
+    music.openFromFile("data/music/Mario_Theme.ogg");
+    music.play();
     int life = 3;
     std::vector <bool> v_intersected;
     std::vector <bool> h_intersected;
