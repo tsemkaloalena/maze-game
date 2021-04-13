@@ -242,8 +242,11 @@ void game_run()
     Font font;
     font.loadFromFile("./data/fonts/HotMustardBTNPosterRegular.ttf");
     Text timerText("", font, 30);
+    Text lifeText("", font, 30);
     timerText.setFillColor(Color(0, 0, 0));
+    lifeText.setFillColor(Color(0, 0, 0));
     timerText.setPosition(10, 10);
+    lifeText.setPosition(200, 10);
 
     while (window.isOpen())
     {
@@ -311,9 +314,6 @@ void game_run()
             }
         }
 
-        std::stringstream ss;
-        ss << life;
-        timerText.setString(ss.str());
         if (life <= 0)
         {
             PLAY = false;
@@ -368,10 +368,14 @@ void game_run()
         if (FRAME_NUMBER % 30 == 0) {
             TIMER++;
         }
-        /*std::stringstream ss;
+        std::stringstream ss;
         ss << TIMER;
-        timerText.setString(ss.str());*/
+        timerText.setString(ss.str());
         window.draw(timerText);
+        std::stringstream sss;
+        sss << life;
+        lifeText.setString(sss.str());
+        window.draw(lifeText);
 
         window.display();
     }
