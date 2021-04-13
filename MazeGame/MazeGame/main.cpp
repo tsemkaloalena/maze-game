@@ -370,11 +370,11 @@ void game_run()
         }
         std::stringstream ss;
         ss << TIMER;
-        timerText.setString(ss.str());
+        timerText.setString("time: " + ss.str());
         window.draw(timerText);
         std::stringstream sss;
         sss << life;
-        lifeText.setString(sss.str());
+        lifeText.setString("lives: " + sss.str());
         window.draw(lifeText);
 
         window.display();
