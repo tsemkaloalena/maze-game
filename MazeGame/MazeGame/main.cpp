@@ -11,8 +11,11 @@ using namespace sf;
 int SPACE_HEIGHT = 50;
 int WIDTH = 600;
 int HEIGHT = 600;
+int SCORE = 0;
+int bonus_map[11][11];
 std::string theme;
 // Здесь должны быть объявлены все функции, находящиеся в этом файле (конечно, кроме main)
+void bonus_generate(int num);
 void load_level(int num);
 void game_run();
 void Menu();
@@ -23,6 +26,9 @@ std::vector <std::vector <Texture>> fieldTextures;
 std::vector <Sprite> borderSprites;
 std::vector <Sprite> roadSprites;
 
+std::string* bonusImages = new std::string[4];
+std::vector <Texture> bonusTextures;
+std::vector <Sprite> bonusSprites;
 std::string* stuffImages = new std::string[3];
 std::vector <Texture> stuffTextures;
 std::vector <Sprite> stuffSprites;
@@ -38,6 +44,24 @@ int main() {
     return 0;
 }
 
+void bonus_generate(int num) {
+    int cnt = 0;
+    float block_size = (float)HEIGHT / level_map[0].size();
+    while (cnt == 0) {
+        srand(time(0));
+        int random_bonus_X = rand() % (level_map[0].size());
+        int random_bonus_Y = rand() % (level_map.size());
+        if (level_map[random_bonus_Y][random_bonus_X] == '.' && bonus_map[random_bonus_Y][random_bonus_X] != 1) {
+            Sprite bonusSprite;
+            bonusSprite.setTexture(bonusTextures[num]);
+            bonusSprite.setPosition(random_bonus_X * block_size + block_size * 0.225, random_bonus_Y * block_size + SPACE_HEIGHT + block_size * 0.225);
+            bonusSprite.setScale(block_size * bonusTextures[num].getSize().x * 0.55, block_size * bonusTextures[num].getSize().x * 0.55);
+            bonusSprites.push_back(bonusSprite);
+            bonus_map[random_bonus_Y][random_bonus_X] = 1;
+            cnt++;
+        }
+    }
+}
 
 void load_level(int num) {
     // Очистка векторов. На случай, когда уровень не первый.
@@ -68,6 +92,11 @@ void load_level(int num) {
     }
     data.close();
 
+    bonusImages[0] = "data/images/" + theme + "_bonus1.png";
+    bonusImages[1] = "data/images/" + theme + "_bonus2.png";
+    bonusImages[2] = "data/images/coin1.png";
+    bonusImages[3] = "data/images/coin2.png";
+
     stuffImages[0] = "data/images/" + theme + "_stuff1.png";
     stuffImages[1] = "data/images/" + theme + "_stuff2.png";
     stuffImages[2] = "data/images/" + theme + "_stuff3.png";
@@ -80,6 +109,11 @@ void load_level(int num) {
             Texture fieldTexture;
             if (level_map[i][j] == '.' or level_map[i][j] == '@' or level_map[i][j] == 'f') {
                 type = "road";
+                if ((i + j) % 5 == rand() % 5) {
+                    Texture bonusTexture;
+                    bonusTexture.loadFromFile(bonusImages[rand() % 4]);
+                    bonusTextures.push_back(bonusTexture);
+                }
             }
             else if (level_map[i][j] == '#') {
                 type = "border";
@@ -128,6 +162,11 @@ void load_level(int num) {
                 finishSprite.setPosition(j * block_size, i * block_size + SPACE_HEIGHT);
             }
         }
+    }
+    int bonus_cnt = 0.38 * roadSprites.size();
+    while (bonus_cnt > 0) {
+        bonus_generate(rand() % bonusTextures.size());
+        bonus_cnt--;
     }
 }
 
@@ -206,6 +245,12 @@ void game_run()
     Text timerText("", font, 30);
     timerText.setFillColor(Color(0, 0, 0));
     timerText.setPosition(10, 10);
+    Text scoreText1("", font, 30);
+    scoreText1.setFillColor(Color(0, 0, 0));
+    scoreText1.setPosition(WIDTH - 180, 10);
+    Text scoreText2("", font, 30);
+    scoreText2.setFillColor(Color(0, 0, 0));
+    scoreText2.setPosition(WIDTH - 65, 10);
 
     while (window.isOpen())
     {
@@ -260,6 +305,9 @@ void game_run()
         for (Sprite elem : roadSprites) {
             window.draw(elem);
         }
+        for (Sprite elem : bonusSprites) {
+            window.draw(elem);
+        }
         if (FRAME_NUMBER % 15 < 7) {
             character.characterSprite.setTexture(character.characterTexture1);
         }
@@ -281,6 +329,12 @@ void game_run()
         ss << TIMER;
         timerText.setString(ss.str());
         window.draw(timerText);
+        scoreText1.setString("Score");
+        window.draw(scoreText1);
+        std::stringstream bonus_cnt;
+        bonus_cnt << SCORE;
+        scoreText2.setString(bonus_cnt.str());
+        window.draw(scoreText2);
 
         window.display();
     }
