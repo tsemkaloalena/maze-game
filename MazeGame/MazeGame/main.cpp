@@ -260,7 +260,7 @@ void game_run()
     window.setPosition(sf::Vector2i(0, 0));
     window.setFramerateLimit(30);
 
-    load_level(3);
+    load_level(1);
 
     Font font;
     font.loadFromFile("./data/fonts/HotMustardBTNPosterRegular.ttf");
