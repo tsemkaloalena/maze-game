@@ -29,7 +29,8 @@ std::vector <Sprite> roadSprites;
 
 std::string* bonusImages = new std::string[4];
 std::vector <Texture> bonusTextures;
-std::vector <Sprite> bonusSprites;
+std::vector <Sprite> bonusSprites1;
+std::vector <Sprite> bonusSprites2;
 std::string* stuffImages = new std::string[3];
 std::vector <Texture> stuffTextures;
 std::vector <Sprite> stuffSprites;
@@ -57,7 +58,12 @@ void bonus_generate() {
     bonusSprite.setTexture(bonusTextures[t]);
     bonusSprite.setPosition(bonus_X * block_size + block_size * 0.225, bonus_Y * block_size + SPACE_HEIGHT + block_size * 0.225);
     bonusSprite.setScale(block_size / bonusTextures[t].getSize().x * 0.55, block_size / bonusTextures[t].getSize().x * 0.55);
-    bonusSprites.push_back(bonusSprite);
+    if (t == 0) {
+        bonusSprites1.push_back(bonusSprite);
+    }
+    else {
+        bonusSprites2.push_back(bonusSprite);
+    }
     bonus_map[bonus_Y][bonus_X] = 1;
     no_bonus_YX.erase(no_bonus_YX.begin() + num);
 }
@@ -95,8 +101,8 @@ void load_level(int num) {
     data.close();
 
     bonusImages[0] = "data/images/" + theme + "_bonus1.png";
-    bonusImages[1] = "data/images/coin1.png";
-    bonusImages[2] = "data/images/" + theme + "_bonus2.png";
+    bonusImages[1] = "data/images/" + theme + "_bonus2.png";
+    bonusImages[2] = "data/images/coin1.png";
     bonusImages[3] = "data/images/coin2.png";
 
     stuffImages[0] = "data/images/" + theme + "_stuff1.png";
@@ -254,7 +260,7 @@ void game_run()
     window.setPosition(sf::Vector2i(0, 0));
     window.setFramerateLimit(30);
 
-    load_level(1);
+    load_level(3);
 
     Font font;
     font.loadFromFile("./data/fonts/HotMustardBTNPosterRegular.ttf");
@@ -321,12 +327,21 @@ void game_run()
         int j = сharacter_X / block_size;
         if (bonus_map[i][j] == 1) {
             SCORE++;
-            for (int e = 0; e < bonusSprites.size(); e++) {
-                Sprite elem = bonusSprites[e];
+            for (int e = 0; e < bonusSprites1.size(); e++) {
+                Sprite elem = bonusSprites1[e];
                 float bonus_X = j * block_size + block_size * 0.225;
                 float bonus_Y = i * block_size + block_size * 0.225 + SPACE_HEIGHT;
                 if (elem.getPosition().x == bonus_X && elem.getPosition().y == bonus_Y) {
-                    bonusSprites.erase(bonusSprites.begin() + e);
+                    bonusSprites1.erase(bonusSprites1.begin() + e);
+                    break;
+                }
+            }
+            for (int e = 0; e < bonusSprites2.size(); e++) {
+                Sprite elem = bonusSprites2[e];
+                float bonus_X = j * block_size + block_size * 0.225;
+                float bonus_Y = i * block_size + block_size * 0.225 + SPACE_HEIGHT;
+                if (elem.getPosition().x == bonus_X && elem.getPosition().y == bonus_Y) {
+                    bonusSprites2.erase(bonusSprites2.begin() + e);
                     break;
                 }
             }
@@ -344,14 +359,24 @@ void game_run()
         for (Sprite elem : roadSprites) {
             window.draw(elem);
         }
-        for (Sprite elem : bonusSprites) {
+        for (Sprite elem : bonusSprites1) {
             //int num = rand() % 2;
-            //if (FRAME_NUMBER % 15 < 7) {
-            //    character.characterSprite.setTexture(bonusTextures[(num) % 2]);
-            //}
-            //else {
-            //    character.characterSprite.setTexture(bonusTextures[(num) % 2 + 2]);
-            //}
+            if (FRAME_NUMBER % 20 < 10) {
+                elem.setTexture(bonusTextures[0]);
+            }
+            else {
+                elem.setTexture(bonusTextures[1]);
+            }
+            window.draw(elem);
+        }
+        for (Sprite elem : bonusSprites2) {
+            //int num = rand() % 2;
+            if (FRAME_NUMBER % 20 < 10) {
+                elem.setTexture(bonusTextures[2]);
+            }
+            else {
+                elem.setTexture(bonusTextures[3]);
+            }
             window.draw(elem);
         }
         if (FRAME_NUMBER % 15 < 7) {
