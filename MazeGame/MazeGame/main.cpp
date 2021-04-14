@@ -12,16 +12,17 @@ int SPACE_HEIGHT = 50;
 int WIDTH = 600;
 int HEIGHT = 600;
 int SCORE = 0;
-int bonus_map[11][11];
 std::string theme;
 // Здесь должны быть объявлены все функции, находящиеся в этом файле (конечно, кроме main)
-void bonus_generate(int num);
+void bonus_generate();
 void load_level(int num);
 void game_run();
 void Menu();
 
 std::vector <std::vector <char>> level_map; // Двумерный массив для хранения знаков уровня
 // # - граница; . - дорога; @ - дорога, начальное положение персонажа
+std::vector <std::vector <int>> bonus_map;
+std::vector <std::vector <int>> no_bonus_YX;
 std::vector <std::vector <Texture>> fieldTextures;
 std::vector <Sprite> borderSprites;
 std::vector <Sprite> roadSprites;
@@ -44,24 +45,23 @@ int main() {
     return 0;
 }
 
-void bonus_generate(int num) {
-    int cnt = 0;
+
+void bonus_generate() {
     float block_size = (float)HEIGHT / level_map[0].size();
-    while (cnt == 0) {
-        srand(time(0));
-        int random_bonus_X = rand() % (level_map[0].size());
-        int random_bonus_Y = rand() % (level_map.size());
-        if (level_map[random_bonus_Y][random_bonus_X] == '.' && bonus_map[random_bonus_Y][random_bonus_X] != 1) {
-            Sprite bonusSprite;
-            bonusSprite.setTexture(bonusTextures[num]);
-            bonusSprite.setPosition(random_bonus_X * block_size + block_size * 0.225, random_bonus_Y * block_size + SPACE_HEIGHT + block_size * 0.225);
-            bonusSprite.setScale(block_size * bonusTextures[num].getSize().x * 0.55, block_size * bonusTextures[num].getSize().x * 0.55);
-            bonusSprites.push_back(bonusSprite);
-            bonus_map[random_bonus_Y][random_bonus_X] = 1;
-            cnt++;
-        }
-    }
+    srand(time(NULL));
+    int t = rand() % bonusTextures.size();
+    int num = rand() % no_bonus_YX.size();
+    int bonus_X = no_bonus_YX[num][1];
+    int bonus_Y = no_bonus_YX[num][0];
+    Sprite bonusSprite;
+    bonusSprite.setTexture(bonusTextures[t]);
+    bonusSprite.setPosition(bonus_X * block_size + block_size * 0.225, bonus_Y * block_size + SPACE_HEIGHT + block_size * 0.225);
+    bonusSprite.setScale(block_size / bonusTextures[t].getSize().x * 0.55, block_size / bonusTextures[t].getSize().x * 0.55);
+    bonusSprites.push_back(bonusSprite);
+    bonus_map[bonus_Y][bonus_X] = 1;
+    no_bonus_YX.erase(no_bonus_YX.begin() + num);
 }
+
 
 void load_level(int num) {
     // Очистка векторов. На случай, когда уровень не первый.
@@ -85,8 +85,10 @@ void load_level(int num) {
     std::string line;
     while (getline(data, line)) {
         level_map.push_back(std::vector<char>());
+        bonus_map.push_back(std::vector<int>());
         for (int j = 0; j < line.size(); j++) {
             level_map[i].push_back(line.c_str()[j]);
+            bonus_map[i].push_back(0);
         }
         i++;
     }
@@ -151,21 +153,33 @@ void load_level(int num) {
                     stuffSprites.push_back(stuffSprite);
                     k++;
                 }
+                bonus_map[i][j] = 2;
             }
             else if (level_map[i][j] == '@') {
                 roadSprites.push_back(fieldSprite);
                 character.make_sprite(theme, j * block_size, i * block_size + SPACE_HEIGHT, block_size * 0.8);
+                bonus_map[i][j] = 2;
             }
             else if (level_map[i][j] == 'f') {
                 roadSprites.push_back(fieldSprite);
                 finishSprite.setScale(block_size / finishTexture.getSize().x, block_size / finishTexture.getSize().y);
                 finishSprite.setPosition(j * block_size, i * block_size + SPACE_HEIGHT);
+                bonus_map[i][j] = 2;
             }
         }
     }
-    int bonus_cnt = 0.38 * roadSprites.size();
+    int cnt_no_bonus = 0;
+    for (int i = 0; i < bonus_map.size(); i++) {
+        for (int j = 0; j < bonus_map[0].size(); j++) {
+            if (bonus_map[i][j] == 0) {
+                no_bonus_YX.push_back({ i, j });
+                cnt_no_bonus++;
+            }
+        }
+    }
+    int bonus_cnt = 0.3 * roadSprites.size();
     while (bonus_cnt > 0) {
-        bonus_generate(rand() % bonusTextures.size());
+        bonus_generate();
         bonus_cnt--;
     }
 }
@@ -296,6 +310,29 @@ void game_run()
                 }
             }
         }
+
+        //bonus
+        float block_size = (float)HEIGHT / level_map[0].size();
+        float сharacter_X = character.characterSprite.getPosition().x;
+        float сharacter_Y = character.characterSprite.getPosition().y;
+        int i = сharacter_Y / block_size;
+        int j = сharacter_X / block_size;
+        if (bonus_map[i][j] == 1) {
+            SCORE++;
+            for (int e = 0; e < bonusSprites.size(); e++) {
+                Sprite elem = bonusSprites[e];
+                float bonus_X = j * block_size + block_size * 0.225;
+                float bonus_Y = i * block_size + block_size * 0.225 + SPACE_HEIGHT;
+                if (elem.getPosition().x == bonus_X && elem.getPosition().y == bonus_Y) {
+                    bonusSprites.erase(bonusSprites.begin() + e);
+                    break;
+                }
+            }
+            bonus_map[i][j] = 0;
+            no_bonus_YX.push_back({ i, j });
+            bonus_generate();
+        }
+        
 
         window.clear(Color(218, 255, 88));
 
