@@ -49,10 +49,10 @@ int main() {
 void bonus_generate() {
     float block_size = (float)HEIGHT / level_map[0].size();
     srand(time(NULL));
-    int t = rand() % bonusTextures.size();
     int num = rand() % no_bonus_YX.size();
     int bonus_X = no_bonus_YX[num][1];
     int bonus_Y = no_bonus_YX[num][0];
+    int t = (bonus_X + bonus_Y) % 2;
     Sprite bonusSprite;
     bonusSprite.setTexture(bonusTextures[t]);
     bonusSprite.setPosition(bonus_X * block_size + block_size * 0.225, bonus_Y * block_size + SPACE_HEIGHT + block_size * 0.225);
@@ -95,8 +95,8 @@ void load_level(int num) {
     data.close();
 
     bonusImages[0] = "data/images/" + theme + "_bonus1.png";
-    bonusImages[1] = "data/images/" + theme + "_bonus2.png";
-    bonusImages[2] = "data/images/coin1.png";
+    bonusImages[1] = "data/images/coin1.png";
+    bonusImages[2] = "data/images/" + theme + "_bonus2.png";
     bonusImages[3] = "data/images/coin2.png";
 
     stuffImages[0] = "data/images/" + theme + "_stuff1.png";
@@ -104,6 +104,7 @@ void load_level(int num) {
     stuffImages[2] = "data/images/" + theme + "_stuff3.png";
 
     // Запись текстур в vector
+    int cnt = 0;
     std::string type;
     for (int i = 0; i < level_map.size(); i++) {
         fieldTextures.push_back(std::vector<Texture>());
@@ -111,10 +112,11 @@ void load_level(int num) {
             Texture fieldTexture;
             if (level_map[i][j] == '.' or level_map[i][j] == '@' or level_map[i][j] == 'f') {
                 type = "road";
-                if ((i + j) % 5 == rand() % 5) {
+                if (cnt < 4) {
                     Texture bonusTexture;
-                    bonusTexture.loadFromFile(bonusImages[rand() % 4]);
+                    bonusTexture.loadFromFile(bonusImages[cnt]);
                     bonusTextures.push_back(bonusTexture);
+                    cnt++;
                 }
             }
             else if (level_map[i][j] == '#') {
@@ -343,6 +345,13 @@ void game_run()
             window.draw(elem);
         }
         for (Sprite elem : bonusSprites) {
+            //int num = rand() % 2;
+            //if (FRAME_NUMBER % 15 < 7) {
+            //    character.characterSprite.setTexture(bonusTextures[(num) % 2]);
+            //}
+            //else {
+            //    character.characterSprite.setTexture(bonusTextures[(num) % 2 + 2]);
+            //}
             window.draw(elem);
         }
         if (FRAME_NUMBER % 15 < 7) {
