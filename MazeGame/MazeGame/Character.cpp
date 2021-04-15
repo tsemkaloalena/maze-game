@@ -5,6 +5,7 @@ using namespace sf;
 
 void Character::make_sprite(std::string theme, float x, float y, float size)
 {
+    side = "right";
     characterTexture1.loadFromFile("data/images/" + theme + "_character1.png");
     //characterTexture1.setSmooth(true);
     characterTexture2.loadFromFile("data/images/" + theme + "_character2.png");
