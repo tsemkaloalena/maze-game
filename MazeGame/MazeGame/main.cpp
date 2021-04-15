@@ -348,7 +348,7 @@ void game_run()
 	int TIMER = 0;
 	bool SCORE_RECORDED = false;
 	bool PLAY = true;
-	bool WIN = false;
+	bool WIN = true;
 	HEIGHT = VideoMode::getDesktopMode().height - SPACE_HEIGHT * 4;
 	WIDTH = HEIGHT;
 

@@ -11,7 +11,6 @@ using namespace sf;
 
 class Enemy {
 public:
-	//std::string side = "right";
 	std::string direction;
 	Texture enemyTexture1;
 	Texture enemyTexture2;

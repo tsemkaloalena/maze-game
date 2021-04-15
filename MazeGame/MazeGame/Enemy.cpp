@@ -22,7 +22,11 @@ void Enemy::make_sprite(std::string direction, std::string theme, float x, float
 	enemyTexture2.setSmooth(true);
 	enemySprite.setTexture(enemyTexture1);
 	enemySprite.setPosition(x, y);
-	enemySprite.setScale(size / enemyTexture1.getSize().y, size / enemyTexture1.getSize().y);
+	int s = enemyTexture1.getSize().x;
+	if (enemyTexture1.getSize().x < enemyTexture1.getSize().y) {
+		s = enemyTexture1.getSize().y;
+	}
+	enemySprite.setScale(size / s, size / s);
 }
 
 bool Enemy::can_move(std::vector <Sprite> borderSprites, int x, int y) {
