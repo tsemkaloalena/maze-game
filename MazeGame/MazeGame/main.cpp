@@ -334,13 +334,51 @@ void Menu()
 	}
 }
 
+SoundBuffer bonusBuffer;
+Sound music_bonus(bonusBuffer);
+SoundBuffer enemyBuffer;
+Sound music_enemy(enemyBuffer);
+SoundBuffer winBuffer;
+Sound music_win(winBuffer);
+SoundBuffer game_overBuffer;
+Sound music_game_over(game_overBuffer);
+void play_music(bool ic, std::string type, bool played=false)
+{
+	if (type == "bonus") {
+		if (ic) {
+			music_bonus.play();
+		}
+	}
+	else if (type == "enemy") {
+		if (ic) {
+			music_enemy.play();
+		}
+	}
+	else if (type == "win" && played==false) {
+		if (ic) {
+			music_win.play();
+		}
+	}
+	else if (type == "game_over" && played==false) {
+		if (ic) {
+			music_game_over.play();
+		}
+	}
+}
 
 // Функция с процессом игры
 void game_run()
 {
 	Music music;
-	music.openFromFile("data/music/Mario_Theme.ogg");
+	music.openFromFile("data/music/music.ogg");
+	music.setVolume(5);
 	music.play();
+	bool win_played = false;
+	bool game_over_played = false;
+	bonusBuffer.loadFromFile("data/music/bonus.ogg");
+	enemyBuffer.loadFromFile("data/music/enemy.ogg");
+	winBuffer.loadFromFile("data/music/win.ogg");
+	game_overBuffer.loadFromFile("data/music/game_over.ogg");
 	int life = 3;
 	std::vector <bool> v_intersected;
 	std::vector <bool> h_intersected;
@@ -513,8 +551,8 @@ void game_run()
 			int i = сharacter_Y / block_size;
 			int j = сharacter_X / block_size;
 			if (bonus_map[i][j] == 1) {
-
 				SCORE++;
+				play_music(true, "bonus");
 				for (int e = 0; e < bonusSprites1.size(); e++) {
 					Sprite elem = bonusSprites1[e];
 					float bonus_X = j * block_size + block_size * 0.225;
@@ -560,9 +598,7 @@ void game_run()
 				}
 			}
 			if (life < old_life) {
-				Music music_enemy;
-				music_enemy.openFromFile("data/music/Mario_Theme.ogg");
-				music_enemy.play();
+				play_music(true, "enemy");
 			}
 		}
 
@@ -664,6 +700,14 @@ void game_run()
 		window.draw(lifeText);
 
 		if (not PLAY) {
+			if (WIN) {
+				play_music(true, "win", win_played);
+				win_played = true;
+			}
+			else {
+				play_music(true, "game_over", game_over_played);
+				game_over_played = true;
+			}
 			window.draw(rectangle);
 			window.draw(nextBtn);
 			window.draw(restartBtn);
