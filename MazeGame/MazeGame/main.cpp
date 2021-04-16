@@ -115,7 +115,7 @@ void load_level(int num) {
 	// Очистка векторов. На случай, когда уровень не первый.
 	bonusImages = new std::string[4];
 	stuffImages = new std::string[3];
-	
+
 	bonus_map.clear();
 	no_bonus_YX.clear();
 	bonusTextures.clear();
@@ -284,18 +284,19 @@ void load_level(int num) {
 
 void Menu()
 {
-	RenderWindow window(VideoMode(350, 300), "Maze game - menu");
+	RenderWindow window(VideoMode(400, 400), "Maze game - menu");
 	Font font;
-	font.loadFromFile("./data/fonts/Roboto-Regular.ttf");
+	font.loadFromFile("./data/fonts/HotMustardBTNPosterRegular.ttf");
 	Text start("Start", font, 70);
 	start.setFillColor(Color(0, 7, 77));
 	Text score("Score", font, 70);
 	score.setFillColor(Color(0, 7, 77));
 	Text exit("Exit", font, 70);
 	exit.setFillColor(Color(0, 7, 77));
-	start.setPosition(100, 30);
-	score.setPosition(100, 90);
-	exit.setPosition(100, 150);
+
+	score.setPosition((window.getSize().x - score.getLocalBounds().width) / 2, (window.getSize().y - score.getLocalBounds().height) / 2);
+	start.setPosition((window.getSize().x - start.getLocalBounds().width) / 2, score.getPosition().y - 90);
+	exit.setPosition((window.getSize().x - exit.getLocalBounds().width) / 2, score.getPosition().y + 90);
 	bool isMenu = 1;
 	int MenuNum = 0;
 
@@ -314,11 +315,11 @@ void Menu()
 
 		MenuNum = 0;
 		window.clear(Color(129, 181, 221));
-		if (IntRect(100, 30, 300, 50).contains(Mouse::getPosition(window))) { start.setFillColor(Color::Blue); MenuNum = 1; }
+		if (IntRect(start.getGlobalBounds()).contains(Mouse::getPosition(window))) { start.setFillColor(Color::Blue); MenuNum = 1; }
 		else { start.setFillColor(Color(0, 7, 77)); }
-		if (IntRect(100, 90, 300, 50).contains(Mouse::getPosition(window))) { score.setFillColor(Color::Blue); MenuNum = 2; }
+		if (IntRect(score.getGlobalBounds()).contains(Mouse::getPosition(window))) { score.setFillColor(Color::Blue); MenuNum = 2; }
 		else { score.setFillColor(Color(0, 7, 77)); }
-		if (IntRect(100, 150, 300, 50).contains(Mouse::getPosition(window))) { exit.setFillColor(Color::Blue); MenuNum = 3; }
+		if (IntRect(exit.getGlobalBounds()).contains(Mouse::getPosition(window))) { exit.setFillColor(Color::Blue); MenuNum = 3; }
 		else { exit.setFillColor(Color(0, 7, 77)); }
 		if (Mouse::isButtonPressed(Mouse::Left))
 		{
@@ -348,7 +349,7 @@ void game_run()
 	int TIMER = 0;
 	bool SCORE_RECORDED = false;
 	bool PLAY = true;
-	bool WIN = true;
+	bool WIN = false;
 	HEIGHT = VideoMode::getDesktopMode().height - SPACE_HEIGHT * 4;
 	WIDTH = HEIGHT;
 
@@ -512,6 +513,7 @@ void game_run()
 			int i = сharacter_Y / block_size;
 			int j = сharacter_X / block_size;
 			if (bonus_map[i][j] == 1) {
+
 				SCORE++;
 				for (int e = 0; e < bonusSprites1.size(); e++) {
 					Sprite elem = bonusSprites1[e];
@@ -536,6 +538,7 @@ void game_run()
 				bonus_generate();
 			}
 
+			int old_life = life;
 			for (int i = 0; i < horizontalEnemies.size(); i++) {
 				horizontalEnemies[i].enemy_move(borderSprites, SPEED, SPACE_HEIGHT, HEIGHT, WIDTH);
 				if (!h_intersected[i] && character.characterSprite.getGlobalBounds().intersects(horizontalEnemies[i].enemySprite.getGlobalBounds())) {
@@ -556,11 +559,22 @@ void game_run()
 					v_intersected[i] = false;
 				}
 			}
+			if (life < old_life) {
+				Music music_enemy;
+				music_enemy.openFromFile("data/music/Mario_Theme.ogg");
+				music_enemy.play();
+			}
 		}
-		
+
+		if (character.characterSprite.getGlobalBounds().intersects(finishSprite.getGlobalBounds())) {
+			WIN = true;
+			music.pause();
+			PLAY = false;
+		}
 
 		if (life <= 0)
 		{
+			music.pause();
 			PLAY = false;
 		}
 
