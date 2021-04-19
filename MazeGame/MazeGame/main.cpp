@@ -373,6 +373,7 @@ void game_run()
 	music.openFromFile("data/music/music.ogg");
 	music.setVolume(5);
 	music.play();
+	music.setLoop(true);
 	bool win_played = false;
 	bool game_over_played = false;
 	bonusBuffer.loadFromFile("data/music/bonus.ogg");
