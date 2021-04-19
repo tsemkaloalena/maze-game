@@ -547,7 +547,7 @@ void game_run()
 			//bonus
 			float block_size = (float)HEIGHT / level_map[0].size();
 			float сharacter_X = character.characterSprite.getPosition().x;
-			float сharacter_Y = character.characterSprite.getPosition().y;
+			float сharacter_Y = character.characterSprite.getPosition().y - SPACE_HEIGHT;
 			int i = сharacter_Y / block_size;
 			int j = сharacter_X / block_size;
 			if (bonus_map[i][j] == 1) {
