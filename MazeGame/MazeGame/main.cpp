@@ -25,6 +25,8 @@ bool level_exists(int n);
 void save_number_of_level(int n);
 void load_number_of_level();
 bool CursorButtonCheck(int x, int y, Text Object);
+std::string getScoreList(int& start, int k);
+void scorelist_view();
 
 std::vector <std::vector <char>> level_map; // Двумерный массив для хранения знаков уровня
 // # - граница; . - дорога; @ - дорога, начальное положение персонажа
@@ -281,6 +283,122 @@ void load_level(int num) {
 	}
 }
 
+std::string getScoreList(int& start, int k) {
+	int place = 1;
+	std::vector<std::string> text;
+	std::string str_text = "";
+	int i = 0;
+	std::string line;
+	std::fstream data;
+	data.open("./data/scorelist.txt", std::ios::in);
+	while (getline(data, line)) {
+		std::string place_str = std::to_string(place);
+		std::string line_temp = place_str + " - " + line + " points";
+		text.push_back(line_temp);
+		place++;
+	}
+	if (text.size() < k) {
+		k = text.size();
+	}
+	if (text.size() - start < k) {
+		start = text.size() - k;
+	}
+	for (int i = start; i < k + start; i++) {
+		str_text += text[i] + "\n";
+	}
+	return str_text;
+}
+
+void scorelist_view() {
+	HEIGHT = VideoMode::getDesktopMode().height - SPACE_HEIGHT * 4;
+	WIDTH = HEIGHT;
+	RenderWindow window(VideoMode(WIDTH, HEIGHT + SPACE_HEIGHT), "Maze game - score list");
+	window.setPosition(sf::Vector2i(0, 0));
+	window.setFramerateLimit(30);
+	float SPEED = 5.0;
+	int SCROLL_START = 0;
+
+	RectangleShape rectangle(Vector2f(window.getSize().x * 0.8, window.getSize().y * 0.7));
+	rectangle.move((window.getSize().x - rectangle.getLocalBounds().width) / 2, (window.getSize().y - rectangle.getLocalBounds().height) / 2);
+	rectangle.setFillColor(Color(255, 255, 255, 50));
+
+	Font font;
+	font.loadFromFile("./data/fonts/HotMustardBTNPosterRegular.ttf");
+	Text mainMenuBtn("Main menu", font, 50);
+	mainMenuBtn.setFillColor(Color(0, 7, 77));
+	mainMenuBtn.setPosition(rectangle.getPosition().x + (rectangle.getLocalBounds().width - mainMenuBtn.getLocalBounds().width) - 20, rectangle.getPosition().y + 10);
+
+	Font title_list_font;
+	title_list_font.loadFromFile("./data/fonts/LithosProBold.otf");
+	Text list_title("Score list", title_list_font, 30);
+	list_title.setFillColor(Color(0, 7, 77));
+
+	Font list_font;
+	list_font.loadFromFile("./data/fonts/LithosProRegular.ttf");
+	Text list("", list_font, 30);
+	list.setFillColor(Color(0, 7, 77));
+	list.setString(getScoreList(SCROLL_START, 15));
+
+	list_title.setPosition(rectangle.getPosition().x + 50, rectangle.getPosition().y + (rectangle.getLocalBounds().height - list.getLocalBounds().height) / 2 - 20);
+	list.setPosition(rectangle.getPosition().x + 50, list_title.getPosition().y + list_title.getLocalBounds().height + 20);
+
+
+	while (window.isOpen())
+	{
+		Event event;
+
+		while (window.pollEvent(event))
+		{
+			switch (event.type)
+			{
+			case Event::Closed:
+				window.close();
+				void (*funct) ();
+				funct = Menu;
+				funct();
+				break;
+			case Event::KeyPressed:
+				break;
+			case Event::MouseMoved:
+				if (CursorButtonCheck(event.mouseMove.x, event.mouseMove.y, mainMenuBtn)) {
+					mainMenuBtn.setFillColor(Color(255, 255, 255));
+				}
+				else {
+					mainMenuBtn.setFillColor(Color(0, 7, 77));
+				}
+				break;
+			case Event::MouseButtonPressed:
+				if (CursorButtonCheck(event.mouseButton.x, event.mouseButton.y, mainMenuBtn)) {
+					window.close();
+					void (*func) ();
+					func = Menu;
+					func();
+				}
+				break;
+			case Event::MouseWheelScrolled:
+				SCROLL_START -= event.mouseWheelScroll.delta;
+				if (SCROLL_START < 0) {
+					SCROLL_START = 0;
+				}
+				list.setString(getScoreList(SCROLL_START, 15));
+			}
+
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Key::Escape))
+		{
+			window.close();
+		}
+
+		window.clear(Color(129, 181, 221));
+
+		window.draw(rectangle);
+		window.draw(mainMenuBtn);
+		window.draw(list_title);
+		window.draw(list);
+
+		window.display();
+	}
+}
 
 void Menu()
 {
@@ -324,7 +442,7 @@ void Menu()
 		if (Mouse::isButtonPressed(Mouse::Left))
 		{
 			if (MenuNum == 1) { window.close(); isMenu = false; game_run(); }
-			if (MenuNum == 2) isMenu = false;
+			if (MenuNum == 2) { window.close(); isMenu = false; scorelist_view(); };
 			if (MenuNum == 3) { window.close(); isMenu = false; }
 		}
 		window.draw(start);
@@ -502,9 +620,9 @@ void game_run()
 					}
 					else if (CursorButtonCheck(event.mouseButton.x, event.mouseButton.y, scorelistBtn)) {
 						window.close();
-						//void (*func) ();
-						//func = scorelist_view;
-						//func();
+						void (*func) ();
+						func = scorelist_view;
+						func();
 					}
 					else if (CursorButtonCheck(event.mouseButton.x, event.mouseButton.y, exitBtn)) {
 						window.close();
@@ -710,6 +828,39 @@ void game_run()
 			if (WIN) {
 				play_music(true, "win", win_played);
 				win_played = true;
+				if (not SCORE_RECORDED) {
+					SCORE_RECORDED = true;
+
+					//std::vector <std::vector <int>> scorelist;
+					bool checker = false;
+					int points;
+					//int index = 0;
+					std::fstream data1;
+					std::ofstream data2;
+					data1.open("./data/scorelist.txt", std::ios::in);
+					data2.open("./data/new_scorelist.txt", std::ios::out);
+					std::string line;
+					while (getline(data1, line)) {
+						points = atoi(line.c_str());
+						//scorelist.push_back({ points });
+						if (points > SCORE) {
+							data2 << points << "\n";
+						}
+						else if (points < SCORE && !checker) {
+							data2 << SCORE << "\n";
+							data2 << points << "\n";
+							checker = true;
+						}
+						else {
+							data2 << points << "\n";
+						}
+					}
+					data1.close();
+					data2.close();
+					remove("./data/scorelist.txt");
+					rename("./data/new_scorelist.txt", "./data/scorelist.txt");
+				}
+				SCORE = 0;
 			}
 			else {
 				play_music(true, "game_over", game_over_played);
